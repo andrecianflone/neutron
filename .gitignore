@@ -1,0 +1,12 @@
+
+# Ignore vim stuff
+*.swp
+
+# Ignore config
+site_config.ini
+
+# Ignore Composer, except .json
+/vendor
+composer.lock
+composer.phar
+

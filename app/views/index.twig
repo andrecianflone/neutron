@@ -1,0 +1,14 @@
+{% extends "_base.twig" %}
+{% block content %}
+<h1>{{ pageName}}</h1>
+<p>
+  {{ blurb }}
+</p>
+
+<div class = "articles">
+  {% for article in articles %}
+    <p>{{ article }}</p>
+  {% endfor %}
+</div> <!--/articles-->
+
+{% endblock %}
