@@ -1,13 +1,16 @@
 
-// New Page, disables default form submit
+// Capture submit button for new page
 $(function() { //shorthand document.ready function
   $('#publish_form').on('submit', function(e) { //use on if jQuery 1.7+
     e.preventDefault();  //prevent form from submitting
-    var data = $("#publish_form :input").serializeArray();
-    var dict = convertToDict(data);
-    console.log(dict);
+    // Send form data with ajax
+    $.post('newpage/', $('#publish_form').serialize())
+      .done(function(msg) {
+        console.log(msg); // print return msg from post request
+      });
   });
 });
+
 
 // When a webpage is selected, load it in the form
 $('#article_sel').on('change', function() {
