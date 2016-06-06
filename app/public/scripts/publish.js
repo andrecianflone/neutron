@@ -2,12 +2,17 @@
 // Capture submit button for new page
 $(function() { //shorthand document.ready function
   $('#publish_form').on('submit', function(e) { //use on if jQuery 1.7+
-    e.preventDefault();  //prevent form from submitting
+    e.preventDefault();  // Stop form from submitting normally
+
     // Send form data with ajax
-    $.post('newpage/', $('#publish_form').serialize())
-      .done(function(msg) {
-        console.log(msg); // print return msg from post request
-      });
+    var posting = $.post('newpage/', $('#publish_form').serialize());
+
+    // Print msg somewhere of return
+    posting.done(function(msg) {
+      $('#result').empty().append(msg);
+      console.log(msg); // print return msg from post request
+    });
+
   });
 });
 
