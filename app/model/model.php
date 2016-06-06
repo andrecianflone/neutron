@@ -18,6 +18,18 @@ class Model {
   }
 
   /**
+   * Get single article
+   */
+  public function getArticle($id) {
+    $sql  = "SELECT id, title, url, blurb, body FROM pages ";
+    $sql .= " WHERE id = :id";
+    $query = $this->db->prepare($sql);
+    $params = array(':id' => $id);
+    $query->execute($params);
+    return $query->fetchAll();
+  }
+
+  /**
    * Get list of current articles
    */
   public function getAllArticles() {

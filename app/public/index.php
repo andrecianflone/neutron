@@ -122,6 +122,13 @@ $app->group('/publish', function() use ($app){
     return "Article added: " . $_POST['title'];
   });
 
+  // Return json data for page with url name
+  $app->get('/getpage/{id}', function ($request, $response, $args) {
+    $article = $this->model->getArticle($args['id']);
+    $newResponse = $response->withJson($article[0]); // return only one json
+    return $newResponse;
+  });
+
 });
 
 // Router for hello/name pattern. "Get" for get requests
@@ -134,7 +141,7 @@ $app->get('/hello/{name}', function (Request $request, Response $response, $arg)
 });
 
 // Router to publish data
-$app->post('/publish/new', function(Request $request, Response $response) {
+$app->post('/publish/sample', function(Request $request, Response $response) {
   $data = $request->getParsedBody(); // parse form in body of request
   // getParsedBody can also parse JSON, given Content-Type header is set properly
   $ticket_data = [];
