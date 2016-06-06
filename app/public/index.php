@@ -2,6 +2,8 @@
 ini_set('display_startup_errors',1);
 ini_set('display_errors',1);
 error_reporting(-1);
+date_default_timezone_set('America/New_York');
+
 // INCLUDE SOME SLIM CLASSES
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
@@ -80,9 +82,9 @@ $container['model'] = function ($container) {
 };
 
 // ============================================================================
-// Routes
+// Routes (Controllers)
 // ============================================================================
-/* Routes are like controllers
+/**
  * All routes callbacks accept 3 params:
  *  - Requests: this contains all the information about the incoming request, headers, variables, etc.
  *  - Response: we can add output and headers to this and, once complete, it will be turned into the HTTP response that the client receives
@@ -117,9 +119,14 @@ $app->group('/publish', function() use ($app){
 
   // Handle new articles, assumes request via ajax. Returns simple message
   $app->post('/new', function ($request, $response, $args) {
-    $this->model->addNewArticle(
+    $res = $this->model->addNewArticle(
       $_POST['title'], $_POST['url'], $_POST['blurb'],$_POST['body']);
-    return "Article added: " . $_POST['title'];
+    //return $res;
+    if ($res === TRUE) {
+      return " Article added: " . $_POST['title'];
+    } else {
+      return "Error: " . $res;
+    }
   });
 
   // Return json data for page with url name
@@ -127,6 +134,29 @@ $app->group('/publish', function() use ($app){
     $article = $this->model->getArticle($args['id']);
     $newResponse = $response->withJson($article[0]); // return only one json
     return $newResponse;
+  });
+
+  // Return json data for page with url name
+  $app->get('/delete/{id}', function ($request, $response, $args) {
+    $res = $this->model->deleteArticle($args['id']);
+    if ($res === TRUE) {
+      return " Article deleted: ";
+    } else {
+      return "Error: " . $res;
+    }
+  });
+
+  // Handle article update
+  $app->post('/update', function ($request, $response, $args) {
+    $res = $this->model->updateArticle(
+            $_POST['article_sel'], $_POST['title'], $_POST['url'],
+            $_POST['blurb'],$_POST['body']);
+    //return $res;
+    if ($res === TRUE) {
+      return " Article updated at " . date('h:i:sa');
+    } else {
+      return "Error: " . $res;
+    }
   });
 
 });

@@ -49,7 +49,9 @@ function loadAce(gut) {
         name: 'save',
         bindKey: {win: "Ctrl-S", "mac": "Cmd-S"},
         exec: function(editor) {
+          textarea.val(editor.getSession().getValue());
           console.log("saving...", editor.session.getValue());
+          updateArticle();
           // should take value and send to self via ajax
         }
     })

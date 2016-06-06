@@ -47,6 +47,52 @@ class Model {
     $sql .= "VALUES (:title, :url, :blurb, :body)";
     $query = $this->db->prepare($sql);
     $params = array(':title' => $title, ':url' => $url, ':blurb' => $blurb, ':body' => $body);
-    $query->execute($params);
+    try {
+      $query->execute($params);
+    }
+    catch(PDOException $e) {
+      return $e->getMessage();
+    }
+    return true;
+  }
+
+  /**
+   * Add new article
+   */
+  public function updateArticle($id, $title, $url, $blurb, $body) {
+    $sql  = "UPDATE pages SET ";
+    $sql .= "title = :title, ";
+    $sql .= "url = :url, ";
+    $sql .= "blurb = :blurb, ";
+    $sql .= "body = :body ";
+    $sql .= "WHERE id = :id ";
+    $query = $this->db->prepare($sql);
+    $params = array(
+      ':id' => $id, ':title' => $title,
+      ':url' => $url, ':blurb' => $blurb,
+      ':body' => $body);
+    try {
+      $query->execute($params);
+    }
+    catch(PDOException $e) {
+      return $e->getMessage() . $sql;
+    }
+    return true;
+  }
+
+  /**
+   * Delete article
+   */
+  public function deleteArticle($id) {
+    $sql  = "DELETE FROM pages WHERE id = :id ";
+    $query = $this->db->prepare($sql);
+    $params = array(':id' => $id);
+    try {
+      $query->execute($params);
+    }
+    catch(PDOException $e) {
+      return $e->getMessage();
+    }
+    return true;
   }
 }

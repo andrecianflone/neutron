@@ -5,22 +5,24 @@ $(function() { //shorthand document.ready function
     e.preventDefault();  // Stop form from submitting normally
 
     // Send form data with ajax
-    var posting = $.post('newpage/', $('#publish_form').serialize());
+    var posting = $.post('new', $('#publish_form').serialize());
 
-    // Print msg somewhere of return
+    // Print returned message
     posting.done(function(msg) {
       $('#result').empty().append(msg);
-      console.log(msg); // print return msg from post request
     });
 
   });
 });
 
 
-// When a webpage is selected, load it in the form
+// When a webpage is selected, load dropdown menu
 $('#article_sel').on('change', function() {
-  if (this.value != "null") {
-    $.getJSON('getpage/' + this.value, null,
+  loadDropDown($('#article_sel'));
+});
+function loadDropDown(elem) {
+  if (elem.val() != "null") {
+    $.getJSON('getpage/' + elem.val(), null,
       function(data){
         $("#url").val(data.url);
         $("#title").val(data.title);
@@ -31,21 +33,27 @@ $('#article_sel').on('change', function() {
         editor.getSession().setValue(data.body);
       }
     );
-    //$('#submit').trigger('click');
+  }
+}
+
+// Delete articles
+$('#delete').click(function() {
+  if(window.confirm('Are you sure you want to delete this article?')) {
+    var get = $.get('delete/ ' + $('#article_sel').val());
+
+    get.done(function(msg) {
+      $('#result').empty().append(msg);
+    });
   }
 });
 
-/**
- * Convenience function to convert form inputs into dict
- */
-function convertToDict(obj) {
-  var output = {}
-  for (inp in obj) {
-    console.log(inp.name);
-    output[inp['name']] = inp['value'];
-  }
-  return output;
+function updateArticle() {
+  // Send form data with ajax
+  var posting = $.post('update', $('#publish_form').serialize());
+
+  // Print returned message
+  posting.done(function(msg) {
+    $('#result').empty().append(msg);
+  });
 }
-
-
 
