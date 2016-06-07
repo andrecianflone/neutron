@@ -2,6 +2,8 @@
 ini_set('display_startup_errors',1);
 ini_set('display_errors',1);
 error_reporting(-1);
+
+// Time zone
 date_default_timezone_set('America/New_York');
 
 // INCLUDE SOME SLIM CLASSES
@@ -40,20 +42,20 @@ $container = $app->getContainer();
 
 // Logging tool. All errors logged to logs/app.log
 $container['logger'] = function($c) {
-    $logger = new \Monolog\Logger('my_logger');
-    $file_handler = new \Monolog\Handler\StreamHandler("../logs/app.log");
-    $logger->pushHandler($file_handler);
-    return $logger;
+  $logger = new \Monolog\Logger('my_logger');
+  $file_handler = new \Monolog\Handler\StreamHandler("../logs/app.log");
+  $logger->pushHandler($file_handler);
+  return $logger;
 }; // Sample usage throughout app: $this->logger->addInfo("A message")
 
 // Database Connection object, as PDO object
 $container['db'] = function ($c) {
-    $db = $c['settings']['db'];
-    $pdo = new PDO("mysql:host=" . $db['host'] . ";dbname=" . $db['dbname'],
-        $db['user'], $db['pass']);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
-    return $pdo;
+  $db = $c['settings']['db'];
+  $pdo = new PDO("mysql:host=" . $db['host'] . ";dbname=" . $db['dbname'],
+    $db['user'], $db['pass']);
+  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+  return $pdo;
 }; // Access this object in the app by: $this->db
 
 // Configure TWIG
@@ -67,17 +69,20 @@ $container['view'] = function ($container) {
     $container['router'],
     $container['request']->getUri()
   ));
-
   return $view;
 };
+
+// Add Parsedown to app
+$container['parsedown'] = function ($container) {
+  $parse = \Parsedown\Parsedown();
+  return $parse;
+}
 
 // ============================================================================
 // Model
 // ============================================================================
-// the namespace should be part of autoload to load a la new \app\Model\Model
 $container['model'] = function ($container) {
-  require_once('../model/model.php');
-  $model = new Model($container->get('db')); // new model, pass app's db object
+  $model = new Neutrino\Model\Model($container->get('db')); // new model, pass app's db object
   return $model;
 };
 
@@ -102,6 +107,17 @@ $app->get('/', function (Request $request, Response $response) {
   $newArgs = ["pageName" => $pageName, "blurb" => $blurb, "articles" => $articles];
   $response = $this->view->render($response, "index.twig", $newArgs);
   return $response;
+});
+
+// Load single article
+$app->get('/article/{url}', function ($request, $response, $args) {
+  $article = $this->model->getArticleByUrl($args['url'])[0];
+  $rendered_content = $this->parsedown->text($article['body']);
+  return $this->view->render($response, 'article.twig', [
+    'title' => $article['title'],
+    'blurb' => $article['blurb'],
+    'content' => $rendered_content
+  ]);
 });
 
 /**
@@ -129,9 +145,9 @@ $app->group('/publish', function() use ($app){
     }
   });
 
-  // Return json data for page with url name
+  // Return json data for page by using its id
   $app->get('/getpage/{id}', function ($request, $response, $args) {
-    $article = $this->model->getArticle($args['id']);
+    $article = $this->model->getArticleById($args['id']);
     $newResponse = $response->withJson($article[0]); // return only one json
     return $newResponse;
   });

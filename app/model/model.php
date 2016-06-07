@@ -1,5 +1,6 @@
 <?php
 
+namespace Neutrino\Model;
 
 class Model {
   /**
@@ -18,9 +19,21 @@ class Model {
   }
 
   /**
-   * Get single article
+   * Get single article by id
    */
-  public function getArticle($id) {
+  public function getArticleByUrl($url) {
+    $sql  = "SELECT id, title, url, blurb, body FROM pages ";
+    $sql .= " WHERE url = :url";
+    $query = $this->db->prepare($sql);
+    $params = array(':url' => $url);
+    $query->execute($params);
+    return $query->fetchAll();
+  }
+
+  /**
+   * Get single article by id
+   */
+  public function getArticleById($id) {
     $sql  = "SELECT id, title, url, blurb, body FROM pages ";
     $sql .= " WHERE id = :id";
     $query = $this->db->prepare($sql);
