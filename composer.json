@@ -6,6 +6,6 @@
     "erusev/parsedown": "^1.6"
   },
   "autoload": {
-    "psr-4": {"Neutrino\\Model\\": "app/model"}
+    "psr-4": {"Neutrino\\Model\\": "app/Model"}
   }
 }

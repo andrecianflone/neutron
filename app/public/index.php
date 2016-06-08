@@ -3,6 +3,9 @@ ini_set('display_startup_errors',1);
 ini_set('display_errors',1);
 error_reporting(-1);
 
+define("APPDIR", dirname(dirname(__FILE__)));
+define("BASEDIR", dirname(dirname(dirname(__FILE__))));
+
 // Time zone
 date_default_timezone_set('America/New_York');
 
@@ -10,12 +13,12 @@ date_default_timezone_set('America/New_York');
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
-require '../../vendor/autoload.php';
+require BASEDIR . '/vendor/autoload.php';
 
 // LOAD APP CLASSES
-spl_autoload_register(function ($classname) {
-    require ("../classes/" . $classname . ".php");
-});
+//spl_autoload_register(function ($classname) {
+    //require ("../classes/" . $classname . ".php");
+//});
 
 // ============================================================================
 // Configurations
@@ -76,7 +79,7 @@ $container['view'] = function ($container) {
 $container['parsedown'] = function ($container) {
   $parse = \Parsedown\Parsedown();
   return $parse;
-}
+};
 
 // ============================================================================
 // Model
