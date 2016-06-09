@@ -82,13 +82,17 @@ $container['parsedown'] = function ($container) {
 };
 
 // ============================================================================
-// Model
+// Models
 // ============================================================================
-$container['model'] = function ($container) {
-  $model = new Neutrino\Model\Model($container->get('db')); // new model, pass app's db object
+$container['article'] = function ($container) {
+  $model = new Neutrino\Model\Article($container->get('db')); // new model, pass app's db object
   return $model;
 };
 
+$container['login'] = function ($container) {
+  $model = new Neutrino\Model\Login($container->get('db')); // new model, pass app's db object
+  return $model;
+};
 // ============================================================================
 // Routes (Controllers)
 // ============================================================================
@@ -114,7 +118,7 @@ $app->get('/', function (Request $request, Response $response) {
 
 // Load single article
 $app->get('/article/{url}', function ($request, $response, $args) {
-  $article = $this->model->getArticleByUrl($args['url'])[0];
+  $article = $this->article->getArticleByUrl($args['url'])[0];
   $rendered_content = $this->parsedown->text($article['body']);
   return $this->view->render($response, 'article.twig', [
     'title' => $article['title'],
@@ -124,13 +128,42 @@ $app->get('/article/{url}', function ($request, $response, $args) {
 });
 
 /**
+ * Handle login
+ */
+$app->group('/login', function() use ($app){
+
+  // Send to login page
+  $app->get('/', function ($request, $response, $args) {
+    return $this->view->render($response, 'login.twig', [
+      'title' => 'Login'
+    ]);
+  });
+
+  // Handle login form
+  $app->post('/login', function ($request, $response, $args) {
+    $res = $this->login->attempt_login($_POST['username'], $_POST['password']);
+
+    // Redirect according to success of login
+    if ($res === FALSE) {
+      return $this->view->render($response, 'login.twig', [
+        'title' => 'Login',
+        'msg' => '<p> Could no login </p>'
+      ]);
+    } else {
+      return $response->withRedirect('publish');
+    }
+  });
+
+});
+
+/**
  * Handle article publishing
  */
 $app->group('/publish', function() use ($app){
 
   // Load publish page
   $app->get('/', function ($request, $response, $args) {
-    $currentPages = $this->model->getAllArticles();
+    $currentPages = $this->article->getAllArticles();
     return $this->view->render($response, 'publish.twig', [
       'currentPages' => $currentPages
     ]);
@@ -138,7 +171,7 @@ $app->group('/publish', function() use ($app){
 
   // Handle new articles, assumes request via ajax. Returns simple message
   $app->post('/new', function ($request, $response, $args) {
-    $res = $this->model->addNewArticle(
+    $res = $this->article->addNewArticle(
       $_POST['title'], $_POST['url'], $_POST['blurb'],$_POST['body']);
     //return $res;
     if ($res === TRUE) {
@@ -150,14 +183,14 @@ $app->group('/publish', function() use ($app){
 
   // Return json data for page by using its id
   $app->get('/getpage/{id}', function ($request, $response, $args) {
-    $article = $this->model->getArticleById($args['id']);
+    $article = $this->article->getArticleById($args['id']);
     $newResponse = $response->withJson($article[0]); // return only one json
     return $newResponse;
   });
 
   // Return json data for page with url name
   $app->get('/delete/{id}', function ($request, $response, $args) {
-    $res = $this->model->deleteArticle($args['id']);
+    $res = $this->article->deleteArticle($args['id']);
     if ($res === TRUE) {
       return " Article deleted: ";
     } else {
@@ -167,7 +200,7 @@ $app->group('/publish', function() use ($app){
 
   // Handle article update
   $app->post('/update', function ($request, $response, $args) {
-    $res = $this->model->updateArticle(
+    $res = $this->article->updateArticle(
             $_POST['article_sel'], $_POST['title'], $_POST['url'],
             $_POST['blurb'],$_POST['body']);
     //return $res;

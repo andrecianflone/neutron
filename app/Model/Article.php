@@ -2,7 +2,7 @@
 
 namespace Neutrino\Model;
 
-class Model {
+class Article {
   /**
    * database var
    * @var PDO

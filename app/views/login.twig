@@ -1,0 +1,41 @@
+{% extends "_base.twig" %}
+{% block content %}
+<div class="container">
+  <div class="row">
+
+  <h2>{{ title }}</h2>
+  {{ msg }}
+  <form class="form-horizontal" role="form" action="/login/login" method="post">
+
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="Username">Username:</label>
+      <div class="col-sm-3">
+        <input type="text" class="form-control" id="username" name="username" placeholder="Enter username">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="pwd">Password:</label>
+      <div class="col-sm-3">
+        <input type="password" class="form-control" id="pwd" name="password" placeholder="Enter password">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <div class="checkbox">
+          <label><input type="checkbox" name"checkbox">Remember me</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <button type="submit" name="submit" class="btn btn-default">Submit</button>
+      </div>
+    </div>
+  </form>
+
+  </div> <!--/row-->
+</div> <!--/container-->
+{% endblock %}
