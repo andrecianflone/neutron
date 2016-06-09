@@ -4,42 +4,46 @@ namespace Neutrino\Model;
 
 class Login {
   /**
-   * database var
-   * @var PDO
+   * @var PDO $db passed to constructor
+   * @var Session $session passed to constructor
    */
   private $db;
+  private $session;
 
   /**
-   * Pass the $db object from app object
-   * @param $db
+   * @param PDO $db database from app object
+   * @param Session $session
    */
-
-  function __construct($db) {
+  function __construct($db, $session) {
     $this->db = $db;
+    $this->session = $session;
   }
 
   /**
-   * Check if user logged in
+   * Make sure user logged in
    */
-  private function logged_in() {
-    return isset($_SESSION['admin_id']);
+  public function isAuthed() {
+    $logged = $this->session->exists('admin_id');
+    return $logged;
   }
 
+  /**
+   * get user info
+   * @param string $username
+   * @return mixed
+   */
   private function find_admin_by_username($username) {
-    global $connection;
-
-    $query  = "SELECT * ";
-    $query .= "FROM users ";
-    $query .= "WHERE username = '{$username}' ";
-    $query .= "LIMIT 1";
+    $sql  = "SELECT * ";
+    $sql .= "FROM users ";
+    $sql .= "WHERE username = :username ";
+    $sql .= "LIMIT 1";
 
     $query = $this->db->prepare($sql);
-    $params = array(':id' => $id);
+    $params = array(':username' => $username);
     $query->execute($params);
-    $admin_set = $query->fetchAll();
 
-    if($admin_set->rowCount() > 0) {
-      return $admin_set;
+    if($query->rowCount() > 0) {
+      return $query->fetchAll()[0]; // return first class
     } else {
       return null;
     }
@@ -47,26 +51,51 @@ class Login {
 
   public function attempt_login($username, $password) {
     // get username's hashed pass from db
-    $admin = find_admin_by_username($username);
+    $admin = $this->find_admin_by_username($username);
     if ($admin) {
       // found admin, now check password
-      if (password_check($password, $admin["hashed_password"])) {
+      if ($this->check_password($password, $admin->hashed_password)) {
         // password matches
+        $this->session->set('admin_id', $username);
         return $admin;
       } else {
         // password does not match
-        return false;
+        return null;
       }
     } else {
       // admin not found
-      return false;
+      return null;
     }
+  }
+
+  public function logout() {
+    $this->session->destroy();
   }
 
   //===========================================================================
   // PASSWORD
   //===========================================================================
 
+  public function generate_hash($password) {
+    $hash = password_hash($password, PASSWORD_BCRYPT, array("cost" => 10));
+    //Make sure the hash worked
+    $match = $this->check_password($password, $hash);
+    if ($match) {
+      return $hash;
+    } else {
+      return false;
+    }
+  }
+
+  private function check_password($password, $hash) {
+    if (password_verify($password, $hash)) {
+        return true;
+    } else {
+        return false;
+    }
+  }
+
+//old
   private function password_encrypt($password) {
     $hash_format = "$2y$10$"; // Tells PHP to use Blowfish with a "cost" of 10
     $salt_length = 22; // Blowfish salts should be 22-characters or more

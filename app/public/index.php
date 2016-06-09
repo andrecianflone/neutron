@@ -85,12 +85,19 @@ $container['parsedown'] = function ($container) {
 // Models
 // ============================================================================
 $container['article'] = function ($container) {
-  $model = new Neutrino\Model\Article($container->get('db')); // new model, pass app's db object
+  // new article model, pass app's db object
+  $model = new Neutrino\Model\Article($container->get('db'));
+  return $model;
+};
+
+$container['session'] = function ($container) {
+  $model = new Neutrino\Model\Session();
   return $model;
 };
 
 $container['login'] = function ($container) {
-  $model = new Neutrino\Model\Login($container->get('db')); // new model, pass app's db object
+  // new Login , pass app's db object and session manager
+  $model = new Neutrino\Model\Login($container->get('db'), $container->get('session'));
   return $model;
 };
 // ============================================================================
@@ -144,17 +151,44 @@ $app->group('/login', function() use ($app){
     $res = $this->login->attempt_login($_POST['username'], $_POST['password']);
 
     // Redirect according to success of login
-    if ($res === FALSE) {
+    if ($res) {
+      return $response->withRedirect('/publish/');
+    } else {
       return $this->view->render($response, 'login.twig', [
         'title' => 'Login',
-        'msg' => '<p> Could no login </p>'
+        'msg' => 'Could not login'
       ]);
-    } else {
-      return $response->withRedirect('publish');
     }
   });
 
+  // Send to login page
+  $app->get('/logout', function ($request, $response, $args) {
+    $this->login->logout();
+    return $this->view->render($response, 'login.twig', [
+      'title' => 'Login',
+      'msg' => 'Successfully logged out'
+    ]);
+  });
+
 });
+
+
+/**
+ * confirm login middleware
+ */
+$isAuthed = function ($request, $response, $next) use ($container) {
+  $logged = $container['login']->isAuthed();
+  if (!$logged) {
+      return $container['view']->render($response, 'login.twig', [
+        'title' => 'Login',
+        'msg' => 'You need to log in'
+      ]);
+  } else {
+    $response = $next($request, $response);
+  }
+
+  return $response;
+};
 
 /**
  * Handle article publishing
@@ -211,7 +245,7 @@ $app->group('/publish', function() use ($app){
     }
   });
 
-});
+})->add($isAuthed);
 
 // Router for hello/name pattern. "Get" for get requests
 $app->get('/hello/{name}', function (Request $request, Response $response, $arg) {
