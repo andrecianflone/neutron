@@ -77,7 +77,7 @@ $container['view'] = function ($container) {
 
 // Add Parsedown to app
 $container['parsedown'] = function ($container) {
-  $parse = \Parsedown\Parsedown();
+  $parse = new \Parsedown();
   return $parse;
 };
 
@@ -86,7 +86,9 @@ $container['parsedown'] = function ($container) {
 // ============================================================================
 $container['article'] = function ($container) {
   // new article model, pass app's db object
-  $model = new Neutrino\Model\Article($container->get('db'));
+  $db = $container->get('db');
+  $parse = $container->get('parsedown');
+  $model = new Neutrino\Model\Article($db, $parse);
   return $model;
 };
 
@@ -114,11 +116,11 @@ $container['login'] = function ($container) {
 $app->get('/', function (Request $request, Response $response) {
   //$this->logger->addInfo("Called home page");
   //This should be in a model
-  $pageName = "Proximacent";
+  $title= "Proximacent";
   $blurb = "Below are the latest articles";
-  $articles = "articles";
+  $articles = $this->article->getAllArticles();
 
-  $newArgs = ["pageName" => $pageName, "blurb" => $blurb, "articles" => $articles];
+  $newArgs = ["title" => $title, "blurb" => $blurb, "articles" => $articles];
   $response = $this->view->render($response, "index.twig", $newArgs);
   return $response;
 });

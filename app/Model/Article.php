@@ -6,16 +6,19 @@ class Article {
   /**
    * database var
    * @var PDO
+   * @var Parsedown
    */
   private $db;
+  private $parse;
 
   /**
    * Pass the $db object from app object
    * @param $db
    */
 
-  function __construct($db) {
+  function __construct($db, $parse) {
     $this->db = $db;
+    $this->parse = $parse;
   }
 
   /**
@@ -46,10 +49,17 @@ class Article {
    * Get list of current articles
    */
   public function getAllArticles() {
-    $sql = "SELECT id, title FROM pages";
+    $sql = "SELECT id, title, body, url FROM pages";
     $query = $this->db->prepare($sql);
     $query->execute();
-    return $query->fetchAll();
+    $all_articles = $query->fetchAll();
+    // Parse article body from Markdown to HTML
+    foreach ($all_articles as &$article) {
+      $parsed_body = $this->parse->text($article->body);
+      $article->body = $parsed_body;
+    }
+
+    return $all_articles;
   }
 
   /**
