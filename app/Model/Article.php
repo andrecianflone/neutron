@@ -49,7 +49,7 @@ class Article {
    * Get list of current articles
    */
   public function getAllArticles() {
-    $sql = "SELECT id, title, body, url FROM pages";
+    $sql = "SELECT id, blurb, title, body, url FROM pages";
     $query = $this->db->prepare($sql);
     $query->execute();
     $all_articles = $query->fetchAll();

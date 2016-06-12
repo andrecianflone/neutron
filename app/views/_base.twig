@@ -33,7 +33,6 @@
         <ul class="nav navbar-nav">
           <li class="active"><a href="/publish/">publish</a></li>
           <li><a href="#">About</a></li>
-          <li><a href="#">Contact</a></li>
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
             <ul class="dropdown-menu">
@@ -48,7 +47,11 @@
           </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-          <li><a href="login.php"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+          {% if isAuthed() %}
+            <li><a href="/login/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+          {% else %}
+            <li><a href="/login/"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+          {% endif %}
         </ul>
       </div><!--/.nav-collapse -->
     </div><!--/.container-fluid -->
@@ -57,7 +60,7 @@
   <!-- Content -->
   <div class="container">
     <div class="row">
-  {% block content %} >{% endblock %}
+  {% block content %} {% endblock %}
     </div> <!--/row-->
   </div> <!--/container-->
 

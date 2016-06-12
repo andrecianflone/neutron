@@ -65,7 +65,8 @@ $container['db'] = function ($c) {
 // Register component on container
 $container['view'] = function ($container) {
   $view = new \Slim\Views\Twig('../views', [
-    'cache' => false
+    'cache' => false,
+    'debug' => true
     //'cache' => 'path/to/cache'
   ]);
   $view->addExtension(new \Slim\Views\TwigExtension(
@@ -74,6 +75,9 @@ $container['view'] = function ($container) {
   ));
   return $view;
 };
+// Debug Twig, with below you can use dump() function in twig
+//$twig = $container['view']->getEnvironment();
+//$twig->addExtension(new Twig_Extension_Debug());
 
 // Add Parsedown to app
 $container['parsedown'] = function ($container) {
@@ -112,12 +116,27 @@ $container['login'] = function ($container) {
  *  - Arguments: the named placeholders from the URL (more on those in just a moment), this is optional and is usually omitted if there aren’t any
  */
 
+/**
+ * Twig function to check if user is logged in or not
+ */
+$twig_logged = new Twig_SimpleFunction('isAuthed', function() use($container) {
+  $logged = $container['login']->isAuthed();
+  return $logged;
+});
+// Add the function to Twig via app-level Slim middleware
+$app->add(function ($request, $response, $next) use($app, $twig_logged) {
+  // Add login function to Twig
+  $twig = $this->view->getEnvironment();
+  $twig->addFunction($twig_logged);
+  $response = $next($request, $response);
+  return $response;
+});
+
 // Empty requests simply go to homepage
 $app->get('/', function (Request $request, Response $response) {
-  //$this->logger->addInfo("Called home page");
-  //This should be in a model
-  $title= "Proximacent";
-  $blurb = "Below are the latest articles";
+
+  $title = "";
+  $blurb = "";
   $articles = $this->article->getAllArticles();
 
   $newArgs = ["title" => $title, "blurb" => $blurb, "articles" => $articles];
@@ -128,10 +147,10 @@ $app->get('/', function (Request $request, Response $response) {
 // Load single article
 $app->get('/article/{url}', function ($request, $response, $args) {
   $article = $this->article->getArticleByUrl($args['url'])[0];
-  $rendered_content = $this->parsedown->text($article['body']);
+  $rendered_content = $this->parsedown->text($article->body);
   return $this->view->render($response, 'article.twig', [
-    'title' => $article['title'],
-    'blurb' => $article['blurb'],
+    'title' => $article->title,
+    'blurb' => $article->blurb,
     'content' => $rendered_content
   ]);
 });
