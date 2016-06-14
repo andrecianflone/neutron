@@ -47,18 +47,18 @@ class Article {
 
   /**
    * Get list of current articles
+   * Optionally slice each article body, keep beginning
    */
-  public function getAllArticles() {
+  public function getAllArticles($slice = false) {
     $sql = "SELECT id, blurb, title, body, url FROM pages";
     $query = $this->db->prepare($sql);
     $query->execute();
     $all_articles = $query->fetchAll();
     // Parse article body from Markdown to HTML
-    foreach ($all_articles as &$article) {
-      $parsed_body = $this->parse->text($article->body);
-      $article->body = $parsed_body;
+    foreach ($all_articles as &$art) {
+      if ($slice) {$art->body = substr($art->body, 0, $slice);}
+      $art->body = $this->parse->text($art->body);
     }
-
     return $all_articles;
   }
 

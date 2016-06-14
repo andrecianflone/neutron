@@ -137,7 +137,7 @@ $app->get('/', function (Request $request, Response $response) {
 
   $title = "";
   $blurb = "";
-  $articles = $this->article->getAllArticles();
+  $articles = $this->article->getAllArticles(200);
 
   $newArgs = ["title" => $title, "blurb" => $blurb, "articles" => $articles];
   $response = $this->view->render($response, "index.twig", $newArgs);
