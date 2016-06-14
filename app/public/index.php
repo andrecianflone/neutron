@@ -117,7 +117,8 @@ $container['login'] = function ($container) {
  */
 
 /**
- * Twig function to check if user is logged in or not
+ * Twig function to check if user is logged in or not.
+ * This function is available in all templates.
  */
 $twig_logged = new Twig_SimpleFunction('isAuthed', function() use($container) {
   $logged = $container['login']->isAuthed();
