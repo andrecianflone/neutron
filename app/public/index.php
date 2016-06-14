@@ -215,6 +215,7 @@ $isAuthed = function ($request, $response, $next) use ($container) {
 /**
  * Handle article publishing
  */
+//TODO articles should have an index to manage order on homepage
 $app->group('/publish', function() use ($app){
 
   // Load publish page
@@ -229,6 +230,7 @@ $app->group('/publish', function() use ($app){
   $app->post('/new', function ($request, $response, $args) {
     $res = $this->article->addNewArticle(
       $_POST['title'], $_POST['url'], $_POST['blurb'],$_POST['body']);
+    //TODO add "published", "creation date" to db
     //return $res;
     if ($res === TRUE) {
       return " Article added: " . $_POST['title'];
@@ -259,6 +261,7 @@ $app->group('/publish', function() use ($app){
     $res = $this->article->updateArticle(
             $_POST['article_sel'], $_POST['title'], $_POST['url'],
             $_POST['blurb'],$_POST['body']);
+    //TODO add "published" and "update date" to db
     //return $res;
     if ($res === TRUE) {
       return " Article updated at " . date('h:i:sa');
