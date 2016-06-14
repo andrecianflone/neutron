@@ -49,7 +49,7 @@ class Article {
    * Get list of current articles
    * Optionally slice each article body, keep beginning
    */
-  public function getAllArticles($slice = false) {
+  public function getAllArticles($slice = null) {
     $sql = "SELECT id, blurb, title, body, url FROM pages";
     $query = $this->db->prepare($sql);
     $query->execute();
