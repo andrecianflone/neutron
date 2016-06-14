@@ -138,7 +138,8 @@ $app->get('/', function (Request $request, Response $response) {
 
   $title = "";
   $blurb = "";
-  $articles = $this->article->getAllArticles(200);
+  // Get all articles that are published -> true, l
+  $articles = $this->article->getAllArticles(700);
 
   $newArgs = ["title" => $title, "blurb" => $blurb, "articles" => $articles];
   $response = $this->view->render($response, "index.twig", $newArgs);
@@ -229,8 +230,7 @@ $app->group('/publish', function() use ($app){
   // Handle new articles, assumes request via ajax. Returns simple message
   $app->post('/new', function ($request, $response, $args) {
     $res = $this->article->addNewArticle(
-      $_POST['title'], $_POST['url'], $_POST['blurb'],$_POST['body']);
-    //TODO add "published", "creation date" to db
+      $_POST['title'], $_POST['url'], $_POST['blurb'],$_POST['body'], $_POST['is_published']);
     //return $res;
     if ($res === TRUE) {
       return " Article added: " . $_POST['title'];

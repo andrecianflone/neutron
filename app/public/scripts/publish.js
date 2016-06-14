@@ -28,6 +28,7 @@ function loadDropDown(elem) {
         $("#title").val(data.title);
         $("#blurb").val(data.blurb);
         $("#body").val(data.body);
+        $("#
 
         var editor = ace.edit("ace0");
         editor.getSession().setValue(data.body);

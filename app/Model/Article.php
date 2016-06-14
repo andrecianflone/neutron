@@ -49,8 +49,9 @@ class Article {
    * Get list of current articles
    * Optionally slice each article body, keep beginning
    */
-  public function getAllArticles($slice = null) {
+  public function getAllArticles($only_published = false, $slice = null) {
     $sql = "SELECT id, blurb, title, body, url FROM pages";
+    if ($only_published) {$sql .= " WHERE published = TRUE";}
     $query = $this->db->prepare($sql);
     $query->execute();
     $all_articles = $query->fetchAll();
@@ -65,11 +66,17 @@ class Article {
   /**
    * Add new article
    */
-  public function addNewArticle($title, $url, $blurb, $body) {
-    $sql  = "INSERT INTO pages (title, url, blurb, body) ";
-    $sql .= "VALUES (:title, :url, :blurb, :body)";
+  public function addNewArticle($title, $url, $blurb, $body, $published) {
+    $published = ($published == 'Yes') ? 1 : 0;
+    $sql  = "INSERT INTO pages (title, url, blurb, body, dt_created) ";
+    $sql .= "VALUES (:title, :url, :blurb, :body, :published, NOW())";
     $query = $this->db->prepare($sql);
-    $params = array(':title' => $title, ':url' => $url, ':blurb' => $blurb, ':body' => $body);
+    $params = array(
+      ':title' => $title,
+      ':url' => $url,
+      ':blurb' => $blurb,
+      ':body' => $body,
+      ':published' => $published);
     try {
       $query->execute($params);
     }
