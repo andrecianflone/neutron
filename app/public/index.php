@@ -196,7 +196,8 @@ $app->group('/login', function() use ($app){
 
 
 /**
- * confirm login middleware
+ * Confirm login middleware.
+ * Can be added to any group or route requiring login to view content
  */
 $isAuthed = function ($request, $response, $next) use ($container) {
   $logged = $container['login']->isAuthed();
@@ -208,7 +209,6 @@ $isAuthed = function ($request, $response, $next) use ($container) {
   } else {
     $response = $next($request, $response);
   }
-
   return $response;
 };
 
