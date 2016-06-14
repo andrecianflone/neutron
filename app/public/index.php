@@ -229,8 +229,9 @@ $app->group('/publish', function() use ($app){
 
   // Handle new articles, assumes request via ajax. Returns simple message
   $app->post('/new', function ($request, $response, $args) {
+    $published = (isset($_POST['is_published'])) ? 1 : 0;
     $res = $this->article->addNewArticle(
-      $_POST['title'], $_POST['url'], $_POST['blurb'],$_POST['body'], $_POST['is_published']);
+      $_POST['title'], $_POST['url'], $_POST['blurb'],$_POST['body'], $published);
     //return $res;
     if ($res === TRUE) {
       return " Article added: " . $_POST['title'];
@@ -258,10 +259,10 @@ $app->group('/publish', function() use ($app){
 
   // Handle article update
   $app->post('/update', function ($request, $response, $args) {
+    $published = (isset($_POST['is_published'])) ? 1 : 0;
     $res = $this->article->updateArticle(
             $_POST['article_sel'], $_POST['title'], $_POST['url'],
-            $_POST['blurb'],$_POST['body']);
-    //TODO add "published" and "update date" to db
+            $_POST['blurb'], $_POST['body'], $published);
     //return $res;
     if ($res === TRUE) {
       return " Article updated at " . date('h:i:sa');

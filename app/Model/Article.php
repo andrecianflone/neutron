@@ -37,7 +37,7 @@ class Article {
    * Get single article by id
    */
   public function getArticleById($id) {
-    $sql  = "SELECT id, title, url, blurb, body FROM pages ";
+    $sql  = "SELECT id, title, url, blurb, body, published FROM pages ";
     $sql .= " WHERE id = :id";
     $query = $this->db->prepare($sql);
     $params = array(':id' => $id);
@@ -67,7 +67,6 @@ class Article {
    * Add new article
    */
   public function addNewArticle($title, $url, $blurb, $body, $published) {
-    $published = ($published == 'Yes') ? 1 : 0;
     $sql  = "INSERT INTO pages (title, url, blurb, body, dt_created) ";
     $sql .= "VALUES (:title, :url, :blurb, :body, :published, NOW())";
     $query = $this->db->prepare($sql);
@@ -89,18 +88,20 @@ class Article {
   /**
    * Add new article
    */
-  public function updateArticle($id, $title, $url, $blurb, $body) {
+  public function updateArticle($id, $title, $url, $blurb, $body, $published) {
     $sql  = "UPDATE pages SET ";
     $sql .= "title = :title, ";
     $sql .= "url = :url, ";
     $sql .= "blurb = :blurb, ";
-    $sql .= "body = :body ";
+    $sql .= "body = :body, ";
+    $sql .= "published = :published ";
     $sql .= "WHERE id = :id ";
     $query = $this->db->prepare($sql);
     $params = array(
       ':id' => $id, ':title' => $title,
       ':url' => $url, ':blurb' => $blurb,
-      ':body' => $body);
+      ':body' => $body, ':published' => $published
+    );
     try {
       $query->execute($params);
     }
