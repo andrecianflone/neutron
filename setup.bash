@@ -18,3 +18,15 @@ echo "Setting permissions"
 chmod 755 -R app/public
 chmod 755 -R app/views
 chmod 755 -R app/model
+
+# Config file
+echo "================================"
+echo "Creating config file, you'll need to update this"
+cat <<EOF > site_config.ini
+; Database configuration
+[db]
+host   = "localhost"
+user   = "root"
+pass   = "root"
+dbname = "your_database"
+EOF
