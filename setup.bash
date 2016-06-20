@@ -15,9 +15,9 @@ php composer.phar install
 # Make public publicly readeable
 echo "================================"
 echo "Setting permissions"
-chmod 755 -R app/public
-chmod 755 -R app/views
-chmod 755 -R app/model
+chmod -R 755 app/public
+chmod -R 755 app/views
+chmod -R 755 app/model
 
 # Config file
 echo "================================"
