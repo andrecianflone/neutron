@@ -5,6 +5,9 @@
 # Ignore config
 site_config.ini
 
+# Ignore error log
+error_log
+
 # Ignore Composer, except .json
 /vendor
 composer.lock
