@@ -28,7 +28,7 @@ $config['displayErrorDetails'] = true; // on for dev mode
 
 // Configure the database
 // Get settings from site_config.ini with sections
-$site_ini = parse_ini_file('../site_config.ini', true);
+$site_ini = parse_ini_file(BASEDIR . '/site_config.ini', true);
 $config['db']['host']   = $site_ini['db']['host'];
 $config['db']['user']   = $site_ini['db']['user'];
 $config['db']['pass']   = $site_ini['db']['pass'];
