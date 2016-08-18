@@ -1,27 +1,51 @@
-#1/bin/bash
+#!/bin/bash
 
 # Setup composer in project:
 echo "================================"
-echo "Installing composer locally"
-php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php -r "if (hash_file('SHA384', 'composer-setup.php') === '070854512ef404f16bac87071a6db9fd9721da1684cd4589b1196c3faf71b9a2682e2311b36a5079825e155ac7ce150d') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-php composer-setup.php
-php -r "unlink('composer-setup.php');"
+echo "Downloading composer locally"
+EXPECTED_SIGNATURE=$(wget https://composer.github.io/installer.sig -O - -q)
+php-cli -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+ACTUAL_SIGNATURE=$(php-cli -r "echo hash_file('SHA384', 'composer-setup.php');")
+
+if [ "$EXPECTED_SIGNATURE" = "$ACTUAL_SIGNATURE" ]
+then
+    /usr/php/56/bin/php56s composer-setup.php --quiet
+    RESULT=$?
+    rm composer-setup.php
+    #exit $RESULT
+    echo 'Successfully downloaded composer'
+else
+    >&2 echo 'ERROR: Invalid installer signature'
+    rm composer-setup.php
+    exit 1
+fi
 
 # Assumes composer.json exists with required dependencies
+echo "================================"
 echo "Installing dependencies with composer"
-php composer.phar install
+DIRECTORY="vendor"
+rm -fR $DIRECTORY
+php-cli composer.phar install
+
+# If dir not successfully created, try alternative
+if [ ! -d "$DIRECTORY" ]; then
+  echo "**********"
+  echo "It seems composer.phar failed, trying alternative"
+  echo "**********"
+  /usr/php/56/bin/php56s -d register_argc_argv=1 "./composer.phar" install
+fi
 
 # Make public publicly readeable
 echo "================================"
 echo "Setting permissions"
 chmod -R 755 app/public
 chmod -R 755 app/views
-chmod -R 755 app/model
+chmod -R 755 app/Model
 
 # Config file
 echo "================================"
-echo "Creating config file, you'll need to update this"
+echo "Creating config file 'site_config.ini', you'll need to update this"
+rm -f site_config.ini
 cat <<EOF > site_config.ini
 ; Database configuration
 [db]
@@ -30,3 +54,4 @@ user   = "root"
 pass   = "root"
 dbname = "your_database"
 EOF
+echo "================================"
