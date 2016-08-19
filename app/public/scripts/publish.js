@@ -28,7 +28,7 @@ function loadDropDown(elem) {
         $("#title").val(data.title);
         $("#blurb").val(data.blurb);
         $("#body").val(data.body);
-        console.log("published: " + data.published);
+        // Capture published state as boolean
         var box = data.published == 1 ? true : false;
         $("#is_published").prop("checked", box);
 

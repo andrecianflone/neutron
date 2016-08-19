@@ -67,19 +67,22 @@ class Article {
    * Add new article
    */
   public function addNewArticle($title, $url, $blurb, $body, $published) {
-    $sql  = "INSERT INTO pages (title, url, blurb, body, dt_created) ";
+    $sql  = "INSERT INTO pages (title, url, blurb, body, published, dt_created) ";
     $sql .= "VALUES (:title, :url, :blurb, :body, :published, NOW())";
     $query = $this->db->prepare($sql);
     $params = array(
-      ':title' => $title,
-      ':url' => $url,
-      ':blurb' => $blurb,
-      ':body' => $body,
+      ':title'     => $title,
+      ':url'       => $url,
+      ':blurb'     => $blurb,
+      ':body'      => $body,
       ':published' => $published);
     try {
       $query->execute($params);
     }
     catch(PDOException $e) {
+      return $e->getMessage();
+    }
+    catch(Exception $e) {
       return $e->getMessage();
     }
     return true;

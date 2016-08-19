@@ -228,6 +228,7 @@ $app->group('/publish', function() use ($app){
   });
 
   // Handle new articles, assumes request via ajax. Returns simple message
+  // TODO refresh dropdown with new article name
   $app->post('/new', function ($request, $response, $args) {
     $published = (isset($_POST['is_published'])) ? 1 : 0;
     $res = $this->article->addNewArticle(
@@ -247,11 +248,11 @@ $app->group('/publish', function() use ($app){
     return $newResponse;
   });
 
-  // Return json data for page with url name
+  // Delete article based on id
   $app->get('/delete/{id}', function ($request, $response, $args) {
     $res = $this->article->deleteArticle($args['id']);
     if ($res === TRUE) {
-      return " Article deleted: ";
+      return " Article deleted ";
     } else {
       return "Error: " . $res;
     }
