@@ -50,7 +50,7 @@ function loadAce(gut) {
         bindKey: {win: "Ctrl-S", "mac": "Cmd-S"},
         exec: function(editor) {
           textarea.val(editor.getSession().getValue());
-          updateArticle();
+          updateArticle(); //in publish.js
           // should take value and send to self via ajax
         }
     })
@@ -67,10 +67,9 @@ function addButtons() {
   var aceEditor = ace.edit('ace0');
 
   afterNode = textArea;
-  addGutter(afterNode, aceEditor);
-  addMarkdown(afterNode, aceEditor);
   addJavascript(afterNode, aceEditor);
-
+  addMarkdown(afterNode, aceEditor);
+  addGutter(afterNode, aceEditor);
 }
 
 /**

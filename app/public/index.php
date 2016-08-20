@@ -146,7 +146,7 @@ $app->get('/', function (Request $request, Response $response) {
   return $response;
 });
 
-// Load single article
+// Load single article to standard view
 $app->get('/article/{url}', function ($request, $response, $args) {
   $article = $this->article->getArticleByUrl($args['url'])[0];
   $rendered_content = $this->parsedown->text($article->body);
@@ -155,6 +155,15 @@ $app->get('/article/{url}', function ($request, $response, $args) {
     'blurb' => $article->blurb,
     'content' => $rendered_content
   ]);
+});
+
+// Parse markdown in POST and return as JSON
+// Useful for previewing an article
+$app->post('/article/parse_md', function ($request, $response, $args) {
+  $rend_body = $this->parsedown->text($_POST['body']);
+  $data = array('title' => $_POST['title'], 'body' => $rend_body);
+  $newResponse = $response->withJson($data); // return only one json
+  return $newResponse;
 });
 
 /**

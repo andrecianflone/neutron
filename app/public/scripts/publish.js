@@ -60,3 +60,22 @@ function updateArticle() {
   });
 }
 
+// Output article in preview div
+function previewArticle() {
+  // Make sure text area has latest from editor
+  var editor = ace.edit("ace0");
+  form_body = $('#body');
+  form_body.val(editor.getSession().getValue());
+
+  // Get JSON data through post
+  var posting = $.post('/article/parse_md', $('#publish_form').serialize());
+  // Print returned body in preview div
+  posting.done(function(msg) {
+    $('#preview').empty().append(msg['body']);
+  });
+}
+
+// Preview button click
+$('#prev').click(function() {
+  previewArticle();
+});
