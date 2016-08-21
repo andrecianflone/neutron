@@ -39,7 +39,18 @@
     </div>
 
     <div id="body_group" class="form-group">
-      <label for="body">Body:</label>
+      <label for="body">Body: </label>
+      <div class='center' style="float: right;">
+      <label class="radio-inline">
+        <input id='radioAuto' type="radio" name="optradio" value="auto" checked="checked">auto
+      </label>
+      <label class="radio-inline">
+        <input id='radioSplit' type="radio" name="optradio" value="split">split
+      </label>
+      <label class="radio-inline">
+        <input id='radioStack' type="radio" name="optradio" value="stack">stack
+      </label>
+      </div>
       <textarea class="form-control" id="body" name="body" data-editor="markdown" rows="30"></textarea>
     </div>
 

@@ -1,6 +1,4 @@
 
-
-
 body {
   padding-bottom: 60px;
 }
@@ -13,3 +11,25 @@ a:hover {
   text-decoration: none;
 }
 
+.center {
+  text-align: center;
+}
+
+#top_col {
+  position: relative;
+  height: 10px;
+}
+#drag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  height: 10px;
+  width: 100%;
+  cursor: s-resize;
+}
+
+#preview {
+  border-top-color: cornflowerblue;
+  border-top-style: double;
+}

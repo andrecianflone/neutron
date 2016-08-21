@@ -1,4 +1,147 @@
 
+// ------------------------------------------------------
+// SPLIT/STACK PREVIEW WINDOW
+// ------------------------------------------------------
+var radioValue = $("input[name='optradio']:checked").val();
+var autoStack = radioValue == 'auto' ? true : false;
+
+var stacked = 1;
+// Auto split screen on very large view
+var largeWin = false;
+// Check for split on window resize if in auto mode
+$(window).resize(function() {
+  if (autoStack) {
+    splitStackWindows();
+  }
+  resizeEditor();
+});
+
+// Check for split on page load
+$(function () {
+  if (autoStack) {
+    splitStackWindows();
+  }
+});
+
+// On radio change
+$(document).ready(function() {
+  $('input[type=radio][name=optradio]').change(function() {
+    if (this.value == 'auto') {
+      autoStack = true;
+      splitStackWindows();
+    }
+    else if (this.value == 'split') {
+      autoStack = false;
+      splitWindows();
+    }
+    else if (this.value == 'stack') {
+      autoStack = false;
+      stackWindows();
+    }
+  });
+});
+
+// Will split if larger than certain size
+function splitStackWindows() {
+  if ($(window).width() > 1300) {
+    splitWindows();
+  } else if ($(window).width() < 1300) {
+    stackWindows();
+  }
+}
+
+function resizeEditor() {
+  var body_width = $("#body_group").width();
+  $("#ace0").css("width", body_width);
+}
+
+function splitWindows() {
+  if (stacked == 0)
+    return;
+  $('.container').attr('class', 'container_fluid');
+  $(".container_fluid").css("margin-left", "50px");
+  $(".container_fluid").css("margin-right", "50px");
+  $('#col1').removeClass('col-md-12').addClass('col-md-6');
+  $('#col2').removeClass('col-md-12').addClass('col-md-6');
+  $('#col2').css('height', $('#col1').height());
+  $('#preview').css('height', $('#col1').height());
+
+  // Wrap preview
+  $("#preview").wrap( "<div id='r_row' class='row'></div>" );
+  $('#preview').before("<div id='top_col' class='col-md-12'></div>");
+  $('#top_col').prepend("<div id='drag'></div>");
+  $('#preview').addClass('col-md-12');
+  $('#preview').css('overflow', 'auto');
+  stacked = 0;
+  resizeEditor();
+}
+
+function stackWindows() {
+  if (stacked == 1)
+    return;
+  $('.container_fluid').attr('class', 'container');
+  $(".container").css("margin-left", "");
+  $(".container").css("margin-right", "");
+  $('#col1').removeClass('col-md-6').addClass('col-md-12');
+  $('#col2').removeClass('col-md-6').addClass('col-md-12');
+  $('#col2').css('height', '');
+
+  // Unwrap preview div
+  $("#preview").unwrap( "#r_row" );
+  $("#top_col").remove();
+  $('#preview').removeClass('col-md-12');
+  $('#preview').css('overflow', '');
+  $('#drag').css('top', '0');
+  stacked = 1;
+  resizeEditor();
+}
+
+// Move bar
+var isResizing = false;
+var lastDownY = null;
+var maxHeight = 0;
+
+$(function () {
+  var container = $('#r_row'),
+    topcol = $('#top_col'),
+    botcol = $('#preview'),
+    handle = $('#drag');
+
+  // Delegate col2 mouseover to #drag
+  $('#col2').on('mousedown', '#drag', function (e) {
+    maxHeight = $("#r_row").height();
+    isResizing = true;
+    lastDownY = e.screenY;
+  });
+
+  $(document).on('mousemove', function (e) {
+    // we don't want to do anything if we aren't resizing.
+    if (!isResizing)
+      return;
+
+    // Reset vars in case deleted
+    container = $('#r_row');
+    topcol = $('#top_col');
+    botcol = $('#preview');
+    handle = $('#drag');
+
+    var offsetVert = Math.round(e.screenY - lastDownY);
+
+    top_height = Math.min(topcol.height() + offsetVert, maxHeight);
+    bot_height = maxHeight - top_height;
+
+    topcol.css('height', top_height);
+    botcol.css('height', bot_height);
+    lastDownY = e.screenY;
+    container.css('height', maxHeight);
+    handle.css('top', top_height - handle.height());
+  }).on('mouseup', function (e) {
+    // stop resizing
+    isResizing = false;
+  });
+});
+// ------------------------------------------------------
+
 // Capture submit button for new page
 $(function() { //shorthand document.ready function
   $('#publish_form').on('submit', function(e) { //use on if jQuery 1.7+
@@ -15,41 +158,11 @@ $(function() { //shorthand document.ready function
   });
 });
 
-// Auto split screen on very large view
-var largeWin = false;
-$(window).resize(function() {
-  var body_width = $("#body_group").width();
-  $("#ace0").css("width", body_width);
-  if ($(window).width() > 1300 && largeWin == false) {
-    largeWin = true;
-    splitWindows();
-  }
-  else if ($(window).width() < 1300) {
-    largeWin = false;
-    stackWindows();
- }
-});
-
-function splitWindows() {
-    $('.container').attr('class', 'container_fluid');
-    $(".container_fluid").css("margin-left", "50px");
-    $(".container_fluid").css("margin-right", "50px");
-    $('#col1').removeClass('col-md-12').addClass('col-md-6');
-    $('#col2').removeClass('col-md-12').addClass('col-md-6');
-}
-
-function stackWindows() {
-    $('.container_fluid').attr('class', 'container');
-    $(".container").css("margin-left", "");
-    $(".container").css("margin-right", "");
-    $('#col1').removeClass('col-md-6').addClass('col-md-12');
-    $('#col2').removeClass('col-md-6').addClass('col-md-12');
-}
-
 // When a webpage is selected, load dropdown menu
 $('#article_sel').on('change', function() {
   loadDropDown($('#article_sel'));
 });
+
 function loadDropDown(elem) {
   if (elem.val() != "null") {
     $.getJSON('getpage/' + elem.val(), null,
@@ -101,6 +214,8 @@ function previewArticle() {
   var posting = $.post('/article/parse_md', $('#publish_form').serialize());
   // Print returned body in preview div
   posting.done(function(msg) {
+    //$('#preview').find('*').not('#drag').remove();
+    //$('#drag').after(msg['body']);
     $('#preview').empty().append(msg['body']);
   });
 }
