@@ -46,13 +46,17 @@ function loadAce(gut) {
 
     // Save keyboard shortcut
     editor.commands.addCommand({
-        name: 'save',
-        bindKey: {win: "Ctrl-S", "mac": "Cmd-S"},
-        exec: function(editor) {
-          textarea.val(editor.getSession().getValue());
-          updateArticle(); //in publish.js
-          // should take value and send to self via ajax
-        }
+      name: 'save',
+      bindKey: {win: "Ctrl-S", "mac": "Cmd-S"},
+      exec: function(editor) {
+        textarea.val(editor.getSession().getValue());
+        updateArticle(); //in publish.js
+        // should take value and send to self via ajax
+      },
+      bindKey: {win: "Ctrl-P", "mac": "Cmd-P"},
+      exec: function(editor) {
+        previewArticle(); //in publish.js
+      }
     })
 
   });
