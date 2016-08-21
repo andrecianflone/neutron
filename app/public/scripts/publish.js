@@ -15,6 +15,36 @@ $(function() { //shorthand document.ready function
   });
 });
 
+// Auto split screen on very large view
+var largeWin = false;
+$(window).resize(function() {
+  var body_width = $("#body_group").width();
+  $("#ace0").css("width", body_width);
+  if ($(window).width() > 1300 && largeWin == false) {
+    largeWin = true;
+    splitWindows();
+  }
+  else if ($(window).width() < 1300) {
+    largeWin = false;
+    stackWindows();
+ }
+});
+
+function splitWindows() {
+    $('.container').attr('class', 'container_fluid');
+    $(".container_fluid").css("margin-left", "50px");
+    $(".container_fluid").css("margin-right", "50px");
+    $('#col1').removeClass('col-md-12').addClass('col-md-6');
+    $('#col2').removeClass('col-md-12').addClass('col-md-6');
+}
+
+function stackWindows() {
+    $('.container_fluid').attr('class', 'container');
+    $(".container").css("margin-left", "");
+    $(".container").css("margin-right", "");
+    $('#col1').removeClass('col-md-6').addClass('col-md-12');
+    $('#col2').removeClass('col-md-6').addClass('col-md-12');
+}
 
 // When a webpage is selected, load dropdown menu
 $('#article_sel').on('change', function() {

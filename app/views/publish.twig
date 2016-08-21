@@ -5,6 +5,7 @@
 
   <h2>Update/Publish article</h2>
   <p id="result"></p>
+  <div id="col1" class="col-md-12">
   <form method="post" action="" id="publish_form">
 
     <div class="form-group">
@@ -37,17 +38,20 @@
       <textarea  class="form-control" id="blurb" name="blurb"></textarea>
     </div>
 
-    <div class="form-group">
-      <label for="blurb">Body:</label>
+    <div id="body_group" class="form-group">
+      <label for="body">Body:</label>
       <textarea class="form-control" id="body" name="body" data-editor="markdown" rows="30"></textarea>
     </div>
 
     <input id= "submit" type="submit" name="submit" value="Create"/>
     <button id="prev" type="button" class="btn btn-primary">preview</button>
   </form>
+  </div> <!--end form column-->
 
+  <div id="col2" class="col-md-12"> <!--preview column should float on right-->
   <div id="preview">
   </div>
+  </div> <!--end preview column-->
 
 <script src="/scripts/publish.js" type="text/javascript" charset="utf-8"></script>
 {% endblock %}
