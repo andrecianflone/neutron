@@ -194,6 +194,11 @@ $('#delete').click(function() {
 });
 
 function updateArticle() {
+  // First, copy data from editor to text
+  var editor = ace.edit("ace0");
+  form_body = $('#body');
+  form_body.val(editor.getSession().getValue());
+
   // Send form data with ajax
   var posting = $.post('update', $('#publish_form').serialize());
 
@@ -223,4 +228,9 @@ function previewArticle() {
 // Preview button click
 $('#prev').click(function() {
   previewArticle();
+});
+
+// Update button click
+$('#update').click(function() {
+  updateArticle();
 });
