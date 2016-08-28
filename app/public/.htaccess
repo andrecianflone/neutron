@@ -1,5 +1,11 @@
 
 RewriteEngine on
+
+#===================================
+# For testing
+#RewriteRule test test.php [QSA,L]
+#===================================
+
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 #RewriteCond %{REQUEST_URI} !^/public/

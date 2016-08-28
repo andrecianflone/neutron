@@ -25,7 +25,7 @@ class Article {
    * Get single article by id
    */
   public function getArticleByUrl($url) {
-    $sql  = "SELECT id, title, url, blurb, body FROM pages ";
+    $sql  = "SELECT id, title, url, blurb, body, parse_math FROM pages ";
     $sql .= " WHERE url = :url";
     $query = $this->db->prepare($sql);
     $params = array(':url' => $url);
@@ -37,7 +37,7 @@ class Article {
    * Get single article by id
    */
   public function getArticleById($id) {
-    $sql  = "SELECT id, title, url, blurb, body, published FROM pages ";
+    $sql  = "SELECT id, title, url, blurb, body, published, parse_math FROM pages ";
     $sql .= " WHERE id = :id";
     $query = $this->db->prepare($sql);
     $params = array(':id' => $id);
@@ -50,7 +50,7 @@ class Article {
    * Optionally slice each article body, keep beginning
    */
   public function getAllArticles($only_published = false, $slice = null) {
-    $sql = "SELECT id, blurb, title, body, url FROM pages";
+    $sql = "SELECT id, blurb, title, body, url, parse_math FROM pages";
     if ($only_published) {$sql .= " WHERE published = TRUE";}
     $query = $this->db->prepare($sql);
     $query->execute();
@@ -66,16 +66,17 @@ class Article {
   /**
    * Add new article
    */
-  public function addNewArticle($title, $url, $blurb, $body, $published) {
-    $sql  = "INSERT INTO pages (title, url, blurb, body, published, dt_created) ";
-    $sql .= "VALUES (:title, :url, :blurb, :body, :published, NOW())";
+  public function addNewArticle($title, $url, $blurb, $body, $published, $parse_math) {
+    $sql  = "INSERT INTO pages (title, url, blurb, body, published, parse_math, dt_created) ";
+    $sql .= "VALUES (:title, :url, :blurb, :body, :published, :parse_math, NOW())";
     $query = $this->db->prepare($sql);
     $params = array(
       ':title'     => $title,
       ':url'       => $url,
       ':blurb'     => $blurb,
       ':body'      => $body,
-      ':published' => $published);
+      ':published' => $published,
+      ':parse_math'=> $parse_math);
     try {
       $query->execute($params);
     }
@@ -89,21 +90,23 @@ class Article {
   }
 
   /**
-   * Add new article
+   * Update article
    */
-  public function updateArticle($id, $title, $url, $blurb, $body, $published) {
+  public function updateArticle($id, $title, $url, $blurb, $body, $published, $parse_math) {
     $sql  = "UPDATE pages SET ";
     $sql .= "title = :title, ";
     $sql .= "url = :url, ";
     $sql .= "blurb = :blurb, ";
     $sql .= "body = :body, ";
-    $sql .= "published = :published ";
+    $sql .= "published = :published, ";
+    $sql .= "parse_math = :parse_math ";
     $sql .= "WHERE id = :id ";
     $query = $this->db->prepare($sql);
     $params = array(
       ':id' => $id, ':title' => $title,
       ':url' => $url, ':blurb' => $blurb,
-      ':body' => $body, ':published' => $published
+      ':body' => $body, ':published' => $published,
+      ':parse_math' => $parse_math
     );
     try {
       $query->execute($params);
@@ -233,3 +236,4 @@ class Article {
   }
 
 }
+?>

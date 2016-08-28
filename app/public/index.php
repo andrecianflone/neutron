@@ -88,11 +88,18 @@ $container['parsedown'] = function ($container) {
 // ============================================================================
 // Models
 // ============================================================================
+//
+// Article model, pass app's db object
 $container['article'] = function ($container) {
-  // new article model, pass app's db object
   $db = $container->get('db');
   $parse = $container->get('parsedown');
   $model = new Neutrino\Model\Article($db, $parse);
+  return $model;
+};
+
+// Math down model, to parse Latex math
+$container['mathdown'] = function ($container) {
+  $model = new Neutrino\Model\Mathdown();
   return $model;
 };
 
@@ -149,7 +156,12 @@ $app->get('/', function (Request $request, Response $response) {
 // Load single article to standard view
 $app->get('/article/{url}', function ($request, $response, $args) {
   $article = $this->article->getArticleByUrl($args['url'])[0];
-  $rendered_content = $this->parsedown->text($article->body);
+  $parse_math = $article->parse_math == '1' ? 1 : 0;
+  $body = $article->body;
+  if($parse_math) {
+    $body = $this->mathdown->parsemath($body);
+  }
+  $rendered_content = $this->parsedown->text($body);
   return $this->view->render($response, 'article.twig', [
     'title' => $article->title,
     'blurb' => $article->blurb,
@@ -160,7 +172,14 @@ $app->get('/article/{url}', function ($request, $response, $args) {
 // Parse markdown in POST and return as JSON
 // Useful for previewing an article
 $app->post('/article/parse_md', function ($request, $response, $args) {
-  $rend_body = $this->parsedown->text($_POST['body']);
+  $parse_math = (isset($_POST['parse_math'])) ? 1 : 0;
+  //print_r($_POST);
+  $rend_body = $_POST['body'];
+  // Check if has math
+  if($parse_math) {
+    $rend_body = $this->mathdown->parsemath($rend_body);
+  }
+  $rend_body = $this->parsedown->text($rend_body);
   $data = array('title' => $_POST['title'], 'body' => $rend_body);
   $newResponse = $response->withJson($data); // return only one json
   return $newResponse;
@@ -240,8 +259,10 @@ $app->group('/publish', function() use ($app){
   // TODO refresh dropdown with new article name
   $app->post('/new', function ($request, $response, $args) {
     $published = (isset($_POST['is_published'])) ? 1 : 0;
+    $parse_math = (isset($_POST['parse_math'])) ? 1 : 0;
     $res = $this->article->addNewArticle(
-      $_POST['title'], $_POST['url'], $_POST['blurb'],$_POST['body'], $published);
+            $_POST['title'], $_POST['url'], $_POST['blurb'],
+            $_POST['body'], $published, $parse_math);
     //return $res;
     if ($res === TRUE) {
       return " Article added: " . $_POST['title'];
@@ -270,9 +291,10 @@ $app->group('/publish', function() use ($app){
   // Handle article update
   $app->post('/update', function ($request, $response, $args) {
     $published = (isset($_POST['is_published'])) ? 1 : 0;
+    $parse_math = (isset($_POST['parse_math'])) ? 1 : 0;
     $res = $this->article->updateArticle(
             $_POST['article_sel'], $_POST['title'], $_POST['url'],
-            $_POST['blurb'], $_POST['body'], $published);
+            $_POST['blurb'], $_POST['body'], $published, $parse_math);
     //return $res;
     if ($res === TRUE) {
       return " Article updated at " . date('h:i:sa');

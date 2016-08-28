@@ -147,12 +147,23 @@ $(function() { //shorthand document.ready function
   $('#publish_form').on('submit', function(e) { //use on if jQuery 1.7+
     e.preventDefault();  // Stop form from submitting normally
 
-    // Send form data with ajax
-    var posting = $.post('new', $('#publish_form').serialize());
+    success_out = $('#result');
+    error_out = $('#preview');
+    form_data = $('#publish_form').serialize();
 
-    // Print returned message
-    posting.done(function(msg) {
-      $('#result').empty().append(msg);
+    $.ajax({
+        url: "new",
+        type: 'POST',
+        data: form_data,
+        success: function(msg) {
+          success_out.empty().append(msg);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          error_out.empty();
+          error_out.append(xhr.status);
+          error_out.append(thrownError);
+          error_out.append(xhr.responseText);
+        }
     });
 
   });
@@ -172,8 +183,11 @@ function loadDropDown(elem) {
         $("#blurb").val(data.blurb);
         $("#body").val(data.body);
         // Capture published state as boolean
-        var box = data.published == 1 ? true : false;
-        $("#is_published").prop("checked", box);
+        var published = data.published == 1 ? true : false;
+        $("#is_published").prop("checked", published);
+
+        var parse_math = data.parse_math == 1 ? true : false;
+        $("#parse_math").prop("checked", parse_math);
 
         var editor = ace.edit("ace0");
         editor.getSession().setValue(data.body);
@@ -198,13 +212,23 @@ function updateArticle() {
   var editor = ace.edit("ace0");
   form_body = $('#body');
   form_body.val(editor.getSession().getValue());
+  success_out = $('#result');
+  error_out = $('#preview');
+  form_data = $('#publish_form').serialize();
 
-  // Send form data with ajax
-  var posting = $.post('update', $('#publish_form').serialize());
-
-  // Print returned message
-  posting.done(function(msg) {
-    $('#result').empty().append(msg);
+  $.ajax({
+      url: "update",
+      type: 'POST',
+      data: form_data,
+      success: function(msg) {
+        success_out.empty().append(msg);
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        error_out.empty();
+        error_out.append(xhr.status);
+        error_out.append(thrownError);
+        error_out.append(xhr.responseText);
+      }
   });
 }
 
@@ -215,14 +239,51 @@ function previewArticle() {
   form_body = $('#body');
   form_body.val(editor.getSession().getValue());
 
-  // Get JSON data through post
-  var posting = $.post('/article/parse_md', $('#publish_form').serialize());
-  // Print returned body in preview div
-  posting.done(function(msg) {
-    //$('#preview').find('*').not('#drag').remove();
-    //$('#drag').after(msg['body']);
-    $('#preview').empty().append(msg['body']);
+  output = $('#preview');
+  error_out = output;
+  form_data = $('#publish_form').serialize();
+
+  // Get the JSON data
+  $.ajax({
+      url: "/article/parse_md",
+      type: 'POST',
+      data: form_data,
+      success: function(msg) {
+        output.empty().append(msg['body']);
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        error_out.empty();
+        error_out.append(xhr.status);
+        error_out.append(thrownError);
+        error_out.append(xhr.responseText);
+      }
   });
+
+}
+
+// Add a CSS to the head on the fly
+function loadExternalCSS(cssFile) {
+  if(document.createStyleSheet) {
+    try { document.createStyleSheet(cssFile); } catch (e) { }
+  }
+  else {
+    var css;
+    css         = document.createElement('link');
+    css.rel     = 'stylesheet';
+    css.type    = 'text/css';
+    css.media   = "all";
+    css.href    = cssFile;
+    document.getElementsByTagName("head")[0].appendChild(css);
+  }
+}
+
+// Add a CSS to the head on the fly
+function loadExternalJS(jsFile) {
+  var file;
+  file         = document.createElement('script');
+  file.type    = 'text/javascript';
+  file.src     = jsFile;
+  document.getElementsByTagName("head")[0].appendChild(file);
 }
 
 // Preview button click
