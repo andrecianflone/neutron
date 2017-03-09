@@ -15,6 +15,8 @@ class Mathdown {
 
   /**
    * Find math with regex and add proper tags
+   * Adds block-level HTML tags, <div></div> around math, otherwise Markdown
+   * screws up with the math parsing
    */
   private function add_tags($text) {
     // match inline $math$
@@ -29,12 +31,12 @@ class Mathdown {
     // Starts/Ends with two '$'
     // Must have min 1 char in between
     $pattern2 = "/[\$]{2}([^\$]+)[\$]{2}/";
-    $replacement2 = '<span class="math center">$1</span>';
+    $replacement2 = '<div><span class="math center">$1</span></div>';
 
     // match multiline with \beg \end equation:
     // Must have the 's' option to check new lines
     $pattern3 = '/\\\begin{equation}(.+)\\\end{equation}/s';
-    $replacement3 = '<span class="math center">$1</span>';
+    $replacement3 = '<div><span class="math center">$1</span></div>';
 
     $result = preg_replace(
         array($pattern1, $pattern2, $pattern3),
