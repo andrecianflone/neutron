@@ -1,6 +1,6 @@
 <?php
 
-namespace Neutrino\Model;
+namespace Neutron\Model;
 
 class Mathdown {
 

@@ -93,24 +93,24 @@ $container['parsedown'] = function ($container) {
 $container['article'] = function ($container) {
   $db = $container->get('db');
   $parse = $container->get('parsedown');
-  $model = new Neutrino\Model\Article($db, $parse);
+  $model = new Neutron\Model\Article($db, $parse);
   return $model;
 };
 
 // Math down model, to parse Latex math
 $container['mathdown'] = function ($container) {
-  $model = new Neutrino\Model\Mathdown();
+  $model = new Neutron\Model\Mathdown();
   return $model;
 };
 
 $container['session'] = function ($container) {
-  $model = new Neutrino\Model\Session();
+  $model = new Neutron\Model\Session();
   return $model;
 };
 
 $container['login'] = function ($container) {
   // new Login , pass app's db object and session manager
-  $model = new Neutrino\Model\Login($container->get('db'), $container->get('session'));
+  $model = new Neutron\Model\Login($container->get('db'), $container->get('session'));
   return $model;
 };
 // ============================================================================
