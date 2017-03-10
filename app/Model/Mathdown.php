@@ -48,6 +48,9 @@ class Mathdown {
 
   /**
    * Add needed scripts/css to make the math work
+   * Alternatively, you may want to use katex:
+   * https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css
+   * https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.js
    */
   private function add_links($text) {
     $text .= "\n";
