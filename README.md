@@ -41,9 +41,9 @@ Neutron also recognizes your need to write math Latex style directly in Markdown
 
 You can write math with the following patterns:
 ``` markdown
-The equation $h = W_hx + b_h$ is written inline
+The equation $h = W_hx + b_h$ is written inline and renders in your text.
 
-The following equation is centered:
+The following equation will render centered on your page:
 $$
 h = W_hx + b_h
 $$
@@ -72,7 +72,7 @@ bash setup.bash
 ```
 The script will download and run [composer](https://getcomposer.org/). Composer is a dependency manager for PHP. It will read the required dependencies in the `composer.json` file and download and setup everything necessary for the website.
 
-Update the site_config.ini file with you own database settings:
+Setup will create a template settings file. Update the `site_config.ini` file with your own database settings:
 ``` bash
 ; Database configuration
 [db]
@@ -82,4 +82,4 @@ pass   = "user_password"
 dbname = "database_name"
 ```
 
-Setup will generate a sample `.htaccess` file with some necessary and recommended settings. Edit the file if needed and move it to the correct location on your server.
+A sample `.htaccess` file is also created with some necessary and recommended settings. Edit the file if needed and move it to the correct location on your server.
