@@ -249,7 +249,7 @@ $app->group('/publish', function() use ($app){
 
   // Load publish page
   $app->get('/', function ($request, $response, $args) {
-    $currentPages = $this->article->getAllArticles();
+    $currentPages = $this->article->getAllArticles(false, null, 'title');
     return $this->view->render($response, 'publish.twig', [
       'currentPages' => $currentPages
     ]);
