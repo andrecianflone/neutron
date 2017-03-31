@@ -258,7 +258,14 @@ function previewArticle() {
         error_out.append(xhr.responseText);
       }
   });
-
+  // Fix the <pre> tags' classname, make sure inherit fro child <code>
+  var preTags = document.getElementsByTagName("pre");
+  for(var i = 0, max = preTags.length; i < max; i++) 
+  {
+    pre = preTags[i];
+    codeTag = pre.getElementsByTagName('code')[0];
+    pre.className += codeTag.className;
+  }
 }
 
 // Add a CSS to the head on the fly

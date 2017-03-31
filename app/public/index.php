@@ -174,8 +174,9 @@ $app->get('/article/{url}', function ($request, $response, $args) {
 $app->post('/article/parse_md', function ($request, $response, $args) {
   $parse_math = (isset($_POST['parse_math'])) ? 1 : 0;
   //print_r($_POST);
+  // Get the markdown from the post request's body argument
   $rend_body = $_POST['body'];
-  // Check if has math
+  // Render math in the markdown
   if($parse_math) {
     $rend_body = $this->mathdown->parsemath($rend_body);
   }
