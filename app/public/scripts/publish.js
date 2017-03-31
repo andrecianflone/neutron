@@ -248,8 +248,14 @@ function previewArticle() {
       url: "/article/parse_md",
       type: 'POST',
       data: form_data,
+      beforeSend: function(msg){
+        output.html("Loading...");
+      },
       success: function(msg) {
+        // Print to the browser
         output.empty().append(msg['body']);
+        // Fix the <code> formatting by rerunning prism
+        prismRun(); // in prism.js file
       },
       error: function (xhr, ajaxOptions, thrownError) {
         error_out.empty();
@@ -258,14 +264,6 @@ function previewArticle() {
         error_out.append(xhr.responseText);
       }
   });
-  // Fix the <pre> tags' classname, make sure inherit fro child <code>
-  var preTags = document.getElementsByTagName("pre");
-  for(var i = 0, max = preTags.length; i < max; i++) 
-  {
-    pre = preTags[i];
-    codeTag = pre.getElementsByTagName('code')[0];
-    pre.className += codeTag.className;
-  }
 }
 
 // Add a CSS to the head on the fly
