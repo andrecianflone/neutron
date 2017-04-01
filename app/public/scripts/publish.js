@@ -188,9 +188,11 @@ function loadDropDown(elem) {
 
         var parse_math = data.parse_math == 1 ? true : false;
         $("#parse_math").prop("checked", parse_math);
-
+        // Paste body to editor
         var editor = ace.edit("ace0");
         editor.getSession().setValue(data.body);
+        // Flush preview window
+        $("#preview").empty();
       }
     );
   }
@@ -207,6 +209,10 @@ $('#delete').click(function() {
   }
 });
 
+// Update button click
+$('#update').click(function() {
+  updateArticle();
+});
 function updateArticle() {
   // First, copy data from editor to text
   var editor = ace.edit("ace0");
@@ -231,6 +237,11 @@ function updateArticle() {
       }
   });
 }
+
+// Preview button click
+$('#prev').click(function() {
+  previewArticle();
+});
 
 // Output article in preview div
 function previewArticle() {
@@ -291,12 +302,3 @@ function loadExternalJS(jsFile) {
   document.getElementsByTagName("head")[0].appendChild(file);
 }
 
-// Preview button click
-$('#prev').click(function() {
-  previewArticle();
-});
-
-// Update button click
-$('#update').click(function() {
-  updateArticle();
-});
