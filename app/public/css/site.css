@@ -33,3 +33,14 @@ a:hover {
   border-top-color: cornflowerblue;
   border-top-style: double;
 }
+
+#overlay {
+  width: 100%;
+  position: absolute;
+  top: 100px;
+  left: 50px;
+  color: #01313F;
+  font-size: 40px;
+  z-index: 10;
+  background-color: darkcyan;
+}

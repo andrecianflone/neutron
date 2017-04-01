@@ -147,7 +147,6 @@ $(function() { //shorthand document.ready function
   $('#publish_form').on('submit', function(e) { //use on if jQuery 1.7+
     e.preventDefault();  // Stop form from submitting normally
 
-    success_out = $('#result');
     error_out = $('#preview');
     form_data = $('#publish_form').serialize();
 
@@ -156,7 +155,7 @@ $(function() { //shorthand document.ready function
         type: 'POST',
         data: form_data,
         success: function(msg) {
-          success_out.empty().append(msg);
+          printResult(msg);
         },
         error: function (xhr, ajaxOptions, thrownError) {
           error_out.empty();
@@ -204,7 +203,7 @@ $('#delete').click(function() {
     var get = $.get('delete/ ' + $('#article_sel').val());
 
     get.done(function(msg) {
-      $('#result').empty().append(msg);
+      printResult(msg);
     });
   }
 });
@@ -218,7 +217,6 @@ function updateArticle() {
   var editor = ace.edit("ace0");
   form_body = $('#body');
   form_body.val(editor.getSession().getValue());
-  success_out = $('#result');
   error_out = $('#preview');
   form_data = $('#publish_form').serialize();
 
@@ -227,7 +225,7 @@ function updateArticle() {
       type: 'POST',
       data: form_data,
       success: function(msg) {
-        success_out.empty().append(msg);
+        printResult(msg);
       },
       error: function (xhr, ajaxOptions, thrownError) {
         error_out.empty();
@@ -302,3 +300,12 @@ function loadExternalJS(jsFile) {
   document.getElementsByTagName("head")[0].appendChild(file);
 }
 
+function printResult(msg){
+  // Print message to #result div
+  result = $('#result')
+  result.empty().append(msg);
+  // Print message on top of the editor, and fade div
+  var overlay = $("<div id=overlay>"+msg+"</div>")
+  $('#ace0').append(newdiv1);
+  newdiv1.delay(3000).fadeOut();
+}
