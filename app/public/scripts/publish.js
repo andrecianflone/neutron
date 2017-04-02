@@ -18,17 +18,14 @@ $(document).ready(function() {
   // Make editor resizable
   resizable.resizable({
     handles: 's',
+    minHeight: 200,
     resize: function( event, ui ) {
       editor.resize();
     }
   });
 
-  // Fix scrollbar while resizing
-  //resizable.bind('resizestart', function() {disableScroll() });
-  //resizable.bind('resizestop', function() {enableScroll() });
-
   configureEditor(editor, formBody);
-  addButtons(editor);
+  addButtons(editor, resizable);
 });
 
 // Configure the editor
@@ -90,7 +87,7 @@ function addGutter(textArea, editor) {
 }
 
 
-// Add gutter toggle and function
+// Add gutter toggle and event function
 function addMarkdown(textArea, editor) {
   addButton(textArea, "md", "markdown");
 
@@ -266,6 +263,12 @@ $(function() { //shorthand document.ready function
   $('#publish_form').on('submit', function(e) { //use on if jQuery 1.7+
     e.preventDefault();  // Stop form from submitting normally
 
+    // First, update form with editor content
+    var editor = ace.edit('editor');
+    editor.getSession().setValue(data.body);
+    form_body = $('#body');
+    form_body.val(editor.getSession().getValue());
+
     error_out = $('#preview');
     form_data = $('#publish_form').serialize();
 
@@ -287,12 +290,12 @@ $(function() { //shorthand document.ready function
   });
 });
 
-// When a webpage is selected, load dropdown menu
+// When a webpage is selected from the dropdown, load content in form
 $('#article_sel').on('change', function() {
-  loadDropDown($('#article_sel'));
+  loadFromDropDown($('#article_sel'));
 });
 
-function loadDropDown(elem) {
+function loadFromDropDown(elem) {
   if (elem.val() != "null") {
     $.getJSON('getpage/' + elem.val(), null,
       function(data){
@@ -307,7 +310,7 @@ function loadDropDown(elem) {
         var parse_math = data.parse_math == 1 ? true : false;
         $("#parse_math").prop("checked", parse_math);
         // Paste body to editor
-        var editor = ace.edit("ace0");
+        var editor = ace.edit('editor');
         editor.getSession().setValue(data.body);
         // Flush preview window
         $("#preview").empty();
@@ -333,7 +336,7 @@ $('#update').click(function() {
 });
 function updateArticle() {
   // First, copy data from editor to text
-  var editor = ace.edit("ace0");
+  var editor = ace.edit('editor');
   form_body = $('#body');
   form_body.val(editor.getSession().getValue());
   error_out = $('#preview');
@@ -363,7 +366,7 @@ $('#prev').click(function() {
 // Output article in preview div
 function previewArticle() {
   // Make sure text area has latest from editor
-  var editor = ace.edit("ace0");
+  var editor = ace.edit('editor');
   form_body = $('#body');
   form_body.val(editor.getSession().getValue());
 
