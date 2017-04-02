@@ -5,6 +5,7 @@ error_reporting(-1);
 
 define("APPDIR", dirname(dirname(__FILE__)));
 define("BASEDIR", dirname(dirname(dirname(__FILE__))));
+define("IMGDIR", dirname(dirname(dirname(__FILE__))). '/img/');
 
 // Time zone
 date_default_timezone_set('America/New_York');
@@ -85,6 +86,19 @@ $container['parsedown'] = function ($container) {
   return $parse;
 };
 
+//// Error handling
+//class CustomHandler {
+ //public function __invoke($request, $response, $args) {
+   //return $response
+       //->withStatus(500)
+       //->withHeader('Content-Type', 'text/html')
+       //->write('Something went wrong!');
+ //}
+//}
+//$container['errorHandler'] = function($container) {
+  //return new CustomHandler();
+//}; // Access this object in the app by: $this->errorHandler
+
 // ============================================================================
 // Models
 // ============================================================================
@@ -94,6 +108,12 @@ $container['article'] = function ($container) {
   $db = $container->get('db');
   $parse = $container->get('parsedown');
   $model = new Neutron\Model\Article($db, $parse);
+  return $model;
+};
+
+// Math down model, to parse Latex math
+$container['upload'] = function ($container) {
+  $model = new Neutron\Model\Upload();
   return $model;
 };
 
@@ -289,6 +309,25 @@ $app->group('/publish', function() use ($app){
     }
   });
 
+  // Upload a file
+  $app->post('/upload', function ($request, $response, $args) {
+    // If no files, return error
+    $res = null;
+    try {
+      // Check for errors
+      $this->upload->validate($_FILES, IMGDIR);
+      // Try to upload the files
+      $res = $this->upload->uploadImage($_FILES, IMGDIR);
+    } catch (Exception $e){
+      $err = $e->getMessage();
+      $body = $response->getBody();
+      $body->write($err);
+      $newResponse = $response->withStatus(500)->withBody($body);
+      return $newResponse;
+    }
+    return $res;
+  });
+
   // Handle article update
   $app->post('/update', function ($request, $response, $args) {
     $published = (isset($_POST['is_published'])) ? 1 : 0;
@@ -311,7 +350,6 @@ $app->get('/hello/{name}', function (Request $request, Response $response, $arg)
   $name = $arg['name']; // Get name from arg
   $name = $request->getAttribute('name'); // Same as above, alternative
   $response->getBody()->write("Hello, $name"); // View: just print
-
   return $response;
 });
 
