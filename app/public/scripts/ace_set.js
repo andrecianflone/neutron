@@ -71,7 +71,7 @@ function loadAce(gut) {
       exec: function(editor) {
         previewArticle(); //in publish.js
       }
-    })
+    });
 
   });
 };

@@ -1,5 +1,131 @@
 
 // ------------------------------------------------------
+// ACE EDITOR
+// ------------------------------------------------------
+
+// Main setup
+$(document).ready(function() {
+  // Setup ace
+  editor = ace.edit('editor');
+  editor.setTheme('ace/theme/monokai');
+  editor.getSession().setMode('ace/mode/java');
+
+  // Setup resizable
+  resizable = $("#resizable");
+  formBody = $("#body");
+  resizable.height(formBody.height()); // same height as form body
+  formBody.css("display","none"); // hide body
+  // Make editor resizable
+  resizable.resizable({
+    handles: 's',
+    resize: function( event, ui ) {
+      editor.resize();
+    }
+  });
+
+  // Fix scrollbar while resizing
+  //resizable.bind('resizestart', function() {disableScroll() });
+  //resizable.bind('resizestop', function() {enableScroll() });
+
+  configureEditor(editor, formBody);
+  addButtons(editor);
+});
+
+// Configure the editor
+function configureEditor(editor, formBody) {
+  editor.getSession().setTabSize(2);
+  editor.getSession().setValue(formBody.val()); // get text from form body
+  editor.getSession().setUseSoftTabs(true);
+  editor.getSession().setMode("ace/mode/markdown");
+  editor.setTheme("ace/theme/solarized_dark");
+  editor.setFontSize(14);
+  editor.setKeyboardHandler("ace/keyboard/vim"); //vim bindings
+  editor.getSession().setUseWrapMode(true); // wrap text
+  editor.renderer.setShowGutter(true);
+
+  // Keyboard shortcuts
+  editor.commands.addCommand({
+    // Save shortcut
+    name: 'save',
+    bindKey: {win: "Ctrl-S", "mac": "Cmd-S"},
+    exec: function(editor) {
+      updateArticle(); //in publish.js
+      // should take value and send to self via ajax
+    },
+    // Preview shortcut
+    bindKey: {win: "Ctrl-P", "mac": "Cmd-P"},
+    exec: function(editor) {
+      previewArticle();
+    }
+  });
+}
+
+/**
+ * Add buttons after Ace editor
+ */
+function addButtons(editor, afterNode) {
+  addJavascript(afterNode, editor);
+  addMarkdown(afterNode, editor);
+  addGutter(afterNode, editor);
+}
+
+/**
+ * Add single button
+ */
+function addButton(afterNode, btnId, text) {
+  var button = `
+    <button id="${btnId}" type="button" class="btn btn-primary">${text}</button>
+    `;
+  $(button).insertAfter(afterNode);
+}
+
+// Add gutter toggle and function
+function addGutter(textArea, editor) {
+  addButton(textArea, "gutter", "gutter");
+
+  $( "#gutter" ).click(function() {
+    gutter = gutter == true? false : true;
+    editor.renderer.setShowGutter(gutter);
+  });
+}
+
+
+// Add gutter toggle and function
+function addMarkdown(textArea, editor) {
+  addButton(textArea, "md", "markdown");
+
+  // Set mode to markdown
+  $( "#md" ).click(function() {
+    editor.getSession().setMode("ace/mode/markdown");
+  });
+
+}
+
+// Add gutter toggle and function
+function addJavascript(textArea, editor) {
+  addButton(textArea, "js", "javascript");
+
+  // Set mode to javascript
+  $( "#js" ).click(function() {
+    editor.getSession().setMode("ace/mode/javascript");
+  });
+}
+
+// Disable page scrollbar when resizing editor
+function disableScroll() {
+  if ($(document).height() > $(window).height()) {
+    var scrollTop = ($('html').scrollTop()) ? $('html').scrollTop() : $('body').scrollTop(); // Works for Chrome, Firefox, IE...
+    $('html').addClass('noscroll').css('top',-scrollTop);
+  }
+}
+
+// Enable page scrollbar
+function enableScroll() {
+  var scrollTop = parseInt($('html').css('top'));
+  $('html').removeClass('noscroll');
+  $('html,body').scrollTop(-scrollTop);
+}
+// ------------------------------------------------------
 // SPLIT/STACK PREVIEW WINDOW
 // ------------------------------------------------------
 var radioValue = $("input[name='optradio']:checked").val();
@@ -13,7 +139,6 @@ $(window).resize(function() {
   if (autoStack) {
     splitStackWindows();
   }
-  resizeEditor();
 });
 
 // Check for split on page load
@@ -50,23 +175,6 @@ function splitStackWindows() {
   }
 }
 
-// Resize editor on drag
-$(document).ready(function() {
-  var editor = $("#ace0");
-  $("#resizable").resizable({
-    resize: function( event, ui ) {
-      resizable = $('#resizable');
-      editor.css('width', resizable.width());
-      editor.css('height', resizable.height());
-    }
-  });
-});
-
-function resizeEditor() {
-  var body_width = $("#body_group").width();
-  $("#ace0").css("width", body_width);
-}
-
 function splitWindows() {
   if (stacked == 0)
     return;
@@ -85,7 +193,6 @@ function splitWindows() {
   $('#preview').addClass('col-md-12');
   $('#preview').css('overflow', 'auto');
   stacked = 0;
-  resizeEditor();
 }
 
 function stackWindows() {
@@ -105,7 +212,6 @@ function stackWindows() {
   $('#preview').css('overflow', '');
   $('#drag').css('top', '0');
   stacked = 1;
-  resizeEditor();
 }
 
 // Move bar
@@ -152,8 +258,9 @@ $(function () {
     isResizing = false;
   });
 });
-// ------------------------------------------------------
-
+// ----------------------------------------------------------------------------
+// FORM HANDLING
+// ----------------------------------------------------------------------------
 // Capture submit button for new page
 $(function() { //shorthand document.ready function
   $('#publish_form').on('submit', function(e) { //use on if jQuery 1.7+
