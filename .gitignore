@@ -1,9 +1,13 @@
 
 # Ignore vim stuff
 *.swp
+*.swo
 
 # Ignore config
 site_config.ini
+
+# Ignore the image directory
+/img
 
 # Ignore error log
 error_log
