@@ -17,15 +17,30 @@ function loadAce(gut) {
   var count = 0;
   $('textarea[data-editor]').each(function () {
     var textarea = $(this);
+
+    //add surrounding tag
+    resizable = document.createElement('div');
+    resizable.setAttribute('id','resizable');
+    textarea.wrap(resizable);
+    resizable = $('#resizable');
+    resizable.css("width", textarea.width()+26);
+    resizable.css("height", textarea.height());
+
     var mode = textarea.data('editor');
     var editDiv = $('<div>', {
       position: 'absolute',
-      width: textarea.width() + 26,
-      height: textarea.height(),
+      //width: textarea.width() + 26,
+      //height: textarea.height(),
+      top:0,
+      left:0,
+      right:0,
+      bottom:0,
       'class': textarea.attr('class'),
       'id': 'ace' + count++
     }).insertBefore(textarea);
     textarea.css('display', 'none');
+
+
     var editor = ace.edit(editDiv[0]);
     //myeditor = editor;
     //numEditors += 1;
@@ -65,11 +80,9 @@ function loadAce(gut) {
  * Add buttons after Ace editor
  */
 function addButtons() {
-  var textArea = document.querySelector('[data-editor]');
-  var parentNode = textArea.parentNode
   var aceEditor = ace.edit('ace0');
 
-  afterNode = textArea;
+  afterNode = $('#resizable');
   addJavascript(afterNode, aceEditor);
   addMarkdown(afterNode, aceEditor);
   addGutter(afterNode, aceEditor);

@@ -44,3 +44,9 @@ a:hover {
   z-index: 10;
   background-color: darkcyan;
 }
+
+#resizable {
+  padding: 5px;
+  border: 3px solid red;
+  position: relative;
+}

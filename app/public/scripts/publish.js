@@ -50,6 +50,18 @@ function splitStackWindows() {
   }
 }
 
+// Resize editor on drag
+$(document).ready(function() {
+  var editor = $("#ace0");
+  $("#resizable").resizable({
+    resize: function( event, ui ) {
+      resizable = $('#resizable');
+      editor.css('width', resizable.width());
+      editor.css('height', resizable.height());
+    }
+  });
+});
+
 function resizeEditor() {
   var body_width = $("#body_group").width();
   $("#ace0").css("width", body_width);
