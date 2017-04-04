@@ -1,4 +1,8 @@
 
+.container {
+  max-width: 650px !important;
+}
+
 body {
   padding-bottom: 60px;
 }
