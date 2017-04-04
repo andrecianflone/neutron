@@ -2,14 +2,35 @@
 
 namespace Neutron\Model;
 
+/**
+ * Deals with Latex math in the Markdown
+ */
 class Mathdown {
 
   /**
    * Scan text for Latex math and convert for use with Katex
    */
-  public function parsemath($text) {
+  public function parsemath_pre($text) {
     $result = $this->add_tags($text);
     $result = $this->add_links($result);
+    return $result;
+  }
+
+  /**
+   * Remove markdown safe tags
+   * Unfortunately, no inline tags are exempt from markdown, so must use ticks
+   * Here we remove the ticks after the parsedown pass
+   */
+  public function parsemath_post($text) {
+    $pattern1 = "/<\/p>[\n\r]+<div><spaninline/";
+    $replacement1 = '<span';
+    $pattern2 = "/spaninline><\/div>[\n\r]+<p>/";
+    $replacement2 = 'span>';
+    $result = preg_replace(
+        array($pattern1, $pattern2),
+        array($replacement1, $replacement2),
+        $text
+    );
     return $result;
   }
 
@@ -25,7 +46,7 @@ class Mathdown {
     // Middle paren group: what we actually want to keep, we don't want the '$'
     // The rest: starts with '$', followed by minimum 1 char, ending with '$'
     $pattern1 = "/(?<!\\$)[\$]([^\$\n]+)[\$](?!\\$)/";
-    $replacement1 = '<span class="math inline">$1</span>';
+    $replacement1 = "\n<div><spaninline class='math inline'>$1</spaninline></div>\n";
 
     // match multiline $$math$$:
     // Starts/Ends with two '$'

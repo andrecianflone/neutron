@@ -177,15 +177,18 @@ $app->get('/', function (Request $request, Response $response) {
 $app->get('/article/{url}', function ($request, $response, $args) {
   $article = $this->article->getArticleByUrl($args['url'])[0];
   $parse_math = $article->parse_math == '1' ? 1 : 0;
-  $body = $article->body;
+  $rend_body = $article->body;
   if($parse_math) {
-    $body = $this->mathdown->parsemath($body);
+    $rend_body = $this->mathdown->parsemath_pre($rend_body);
+    $rend_body = $this->parsedown->text($rend_body);
+    $rend_body = $this->mathdown->parsemath_post($rend_body);
+  } else {
+    $rend_body = $this->parsedown->text($rend_body);
   }
-  $rendered_content = $this->parsedown->text($body);
   return $this->view->render($response, 'article.twig', [
     'title' => $article->title,
     'blurb' => $article->blurb,
-    'content' => $rendered_content
+    'content' => $rend_body
   ]);
 });
 
@@ -198,9 +201,12 @@ $app->post('/article/parse_md', function ($request, $response, $args) {
   $rend_body = $_POST['body'];
   // Render math in the markdown
   if($parse_math) {
-    $rend_body = $this->mathdown->parsemath($rend_body);
+    $rend_body = $this->mathdown->parsemath_pre($rend_body);
+    $rend_body = $this->parsedown->text($rend_body);
+    $rend_body = $this->mathdown->parsemath_post($rend_body);
+  } else {
+    $rend_body = $this->parsedown->text($rend_body);
   }
-  $rend_body = $this->parsedown->text($rend_body);
   $data = array('title' => $_POST['title'], 'body' => $rend_body);
   $newResponse = $response->withJson($data); // return only one json
   return $newResponse;

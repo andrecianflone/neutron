@@ -265,7 +265,6 @@ $(function() { //shorthand document.ready function
 
     // First, update form with editor content
     var editor = ace.edit('editor');
-    editor.getSession().setValue(data.body);
     form_body = $('#body');
     form_body.val(editor.getSession().getValue());
 
@@ -428,8 +427,8 @@ function printResult(msg){
   result.empty().append(msg);
   // Print message on top of the editor, and fade div
   var overlay = $("<div id=overlay>"+msg+"</div>")
-  $('#ace0').append(newdiv1);
-  newdiv1.delay(3000).fadeOut();
+  $('#editor').append(overlay);
+  overlay.delay(3000).fadeOut();
 }
 
 //-----------------------------------------------------------------------------
