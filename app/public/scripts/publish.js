@@ -21,6 +21,7 @@ $(document).ready(function() {
     minHeight: 200,
     resize: function( event, ui ) {
       editor.resize();
+      previewEqualEditor();
     }
   });
 
@@ -189,7 +190,25 @@ function splitWindows() {
   $('#top_col').prepend("<div id='drag'></div>");
   $('#preview').addClass('col-md-12');
   $('#preview').css('overflow', 'auto');
+
   stacked = 0;
+  previewEqualEditor();
+}
+
+// Make preview aligned with editor
+function previewEqualEditor(){
+  // Only resize if in split mode
+  if (stacked == 1)
+    return;
+  resizable = $('#resizable');
+  // Get resizable offset from
+  resOffset = resizable.offset().top - $('#col1').offset().top;
+  // Set col above preview equal to offset
+  $('#top_col').css('height', resOffset);
+
+  // Set preview size equal to resizable
+  editHeight = resizable.height();
+  $('#preview').css('height', editHeight);
 }
 
 function stackWindows() {
@@ -225,7 +244,7 @@ $(function () {
   // Delegate col2 mouseover to #drag
   $('#col2').on('mousedown', '#drag', function (e) {
     maxHeight = $("#r_row").height();
-    isResizing = true;
+    isResizing = true; // resize possible while mouse click
     lastDownY = e.screenY;
   });
 
