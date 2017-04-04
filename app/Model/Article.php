@@ -51,9 +51,9 @@ class Article {
    */
   public function getAllArticles($only_published=false, $slice=null, $order=null) {
     $sql = "SELECT id, blurb, title, body, url, parse_math FROM pages";
-    if ($only_published) {$sql .= " WHERE url like 'setup_dl_machine'";}
+    //if ($only_published) {$sql .= " WHERE url like 'setup_dl_machine'";}
+    if ($only_published) {$sql .= " WHERE published = TRUE";}
     if ($order) {$sql .= " ORDER BY " . $order;}
-    //if ($only_published) {$sql .= " WHERE published = TRUE";}
     $query = $this->db->prepare($sql);
     $query->execute();
     $all_articles = $query->fetchAll();

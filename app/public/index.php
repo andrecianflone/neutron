@@ -166,7 +166,7 @@ $app->get('/', function (Request $request, Response $response) {
   $title = "";
   $blurb = "";
   // Get all articles that are published -> true, l
-  $articles = $this->article->getAllArticles(true, 1000);
+  $articles = $this->article->getAllArticles(true, 1000, "`dt_created` DESC");
 
   $newArgs = ["title" => $title, "blurb" => $blurb, "articles" => $articles];
   $response = $this->view->render($response, "index.twig", $newArgs);
