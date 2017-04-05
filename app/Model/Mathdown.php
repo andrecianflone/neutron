@@ -25,7 +25,7 @@ class Mathdown {
     $pattern1 = "/<\/p>[\n\r]+<div><spaninline/";
     $replacement1 = '<span';
     $pattern2 = "/spaninline><\/div>[\n\r]+<p>/";
-    $replacement2 = 'span>';
+    $replacement2 = 'span> ';
     $result = preg_replace(
         array($pattern1, $pattern2),
         array($replacement1, $replacement2),
