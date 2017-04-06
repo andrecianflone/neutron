@@ -21,6 +21,21 @@ class Upload {
   }
 
   /**
+   * Get an array of directories in passed directory
+   */
+  public function dirsInDirectory($directory) {
+    $directories = glob($directory . '/*', GLOB_ONLYDIR);
+    return $directories;
+  }
+
+  /**
+   * Get an array of files in a directory
+   */
+  public function filesInDirectory($directory) {
+    $directories = glob($directory . '/*', GLOB_ONLYDIR);
+  }
+
+  /**
    * Validate files
    */
   public function validate($files, $target_dir) {

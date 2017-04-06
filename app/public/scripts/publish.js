@@ -453,6 +453,16 @@ function printResult(msg){
 //-----------------------------------------------------------------------------
 // Upload file
 //-----------------------------------------------------------------------------
+
+// Capture some upload form buttons
+// List all images in the folder
+$( "#list_img" ).click(function() {
+  // Get current selection value
+  dir = $('#dir_sel').val();
+  // TODO
+  // Get list of folders with ajax and list in preview
+});
+
 // Capture the form submit and upload the files
 $('#upload_file').submit(function (event) {
   event.stopPropagation(); // Stop stuff happening

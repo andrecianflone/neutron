@@ -196,7 +196,6 @@ $app->get('/article/{url}', function ($request, $response, $args) {
 // Useful for previewing an article
 $app->post('/article/parse_md', function ($request, $response, $args) {
   $parse_math = (isset($_POST['parse_math'])) ? 1 : 0;
-  //print_r($_POST);
   // Get the markdown from the post request's body argument
   $rend_body = $_POST['body'];
   // Render math in the markdown
@@ -277,8 +276,10 @@ $app->group('/publish', function() use ($app){
   // Load publish page
   $app->get('/', function ($request, $response, $args) {
     $currentPages = $this->article->getAllArticles(false, null, 'title');
+    $directories = $this->upload->dirsInDirectory(IMGDIR);
     return $this->view->render($response, 'publish.twig', [
-      'currentPages' => $currentPages
+      'currentPages' => $currentPages,
+      'directories' => $directories
     ]);
   });
 
@@ -321,9 +322,10 @@ $app->group('/publish', function() use ($app){
     $res = null;
     try {
       // Check for errors
-      $this->upload->validate($_FILES, IMGDIR);
+      $target_dir = $_POST['dir_sel'] . '/';
+      $this->upload->validate($_FILES, $target_dir);
       // Try to upload the files
-      $res = $this->upload->uploadImage($_FILES, IMGDIR);
+      $res = $this->upload->uploadImage($_FILES, $target_dir);
     } catch (Exception $e){
       $err = $e->getMessage();
       $body = $response->getBody();
