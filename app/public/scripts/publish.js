@@ -460,7 +460,51 @@ $( "#list_img" ).click(function() {
   // Get current selection value
   dir = $('#dir_sel').val();
   // TODO
-  // Get list of folders with ajax and list in preview
+  // Get list of files in directory with ajax and list in preview
+  $.ajax({
+    url: "upload/listfiles",
+    type: 'POST',
+    data: dir,
+    cache: false,
+    contentType: false,
+    enctype: 'multipart/form-data',
+    processData: false,
+    success: function(data, textStatus, jqXHR) {
+      result.append('Successfully uploaded files: ' + data);
+    },
+    error: function(xhr, textStatus, error) {
+      // Handle errors
+      error_out.append("Error number: " + xhr.status + '<br>');
+      error_out.append("Error thrown: " + error + '<br>');
+      error_out.append('Error message: ' + xhr.responseText + '<br>');
+    }
+  });
+});
+
+// Create new dir using value in text field
+$( "#new_dir" ).click(function() {
+  // Get current selection value
+  dir = $('#newDirText').val();
+  // TODO
+  // Get list of files in directory with ajax and list in preview
+  $.ajax({
+    url: "upload/listfiles",
+    type: 'POST',
+    data: dir,
+    cache: false,
+    contentType: false,
+    enctype: 'multipart/form-data',
+    processData: false,
+    success: function(data, textStatus, jqXHR) {
+      result.append('Successfully uploaded files: ' + data);
+    },
+    error: function(xhr, textStatus, error) {
+      // Handle errors
+      error_out.append("Error number: " + xhr.status + '<br>');
+      error_out.append("Error thrown: " + error + '<br>');
+      error_out.append('Error message: ' + xhr.responseText + '<br>');
+    }
+  });
 });
 
 // Capture the form submit and upload the files
