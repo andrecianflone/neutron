@@ -25,7 +25,7 @@ class Article {
    * Get single article by id
    */
   public function getArticleByUrl($url) {
-    $sql  = "SELECT id, title, url, blurb, body, parse_math FROM pages ";
+    $sql  = "SELECT id, title, url, blurb, body, parse_math, author FROM pages ";
     $sql .= " WHERE url = :url";
     $query = $this->db->prepare($sql);
     $params = array(':url' => $url);
@@ -50,7 +50,7 @@ class Article {
    * Optionally slice each article body, keep beginning
    */
   public function getAllArticles($only_published=false, $slice=null, $order=null) {
-    $sql = "SELECT id, blurb, title, body, url, parse_math FROM pages";
+    $sql = "SELECT id, blurb, title, body, url, parse_math, author FROM pages";
     //if ($only_published) {$sql .= " WHERE url like 'setup_dl_machine'";}
     if ($only_published) {$sql .= " WHERE published = TRUE";}
     if ($order) {$sql .= " ORDER BY " . $order;}
