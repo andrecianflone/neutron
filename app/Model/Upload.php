@@ -58,7 +58,8 @@ class Upload {
    * Get an array of files in a directory
    */
   public function filesInDirectory($directory) {
-    $directories = glob($directory . '/*', GLOB_ONLYDIR);
+    $dirs = scandir($directory);
+    return $dirs;
   }
 
   /**

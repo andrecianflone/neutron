@@ -337,10 +337,27 @@ $app->group('/publish', function() use ($app){
     return $res;
   });
 
+  // Return all files in a dir
+  $app->post('/listfiles', function ($request, $response, $args) {
+    $directory = $_POST['dir_sel'];
+    //print_r($_POST);
+    //return $request;
+    try {
+      $fileList = $this->upload->filesInDirectory($directory);
+      return $response->withJson($fileList);
+    } catch (Exception $e){
+      $err = $e->getMessage();
+      $body = $response->getBody();
+      $body->write($err);
+      $newResponse = $response->withStatus(500)->withBody($body);
+      return $newResponse;
+    }
+  });
+
+  // Try to create new directory
   $app->post('/new_dir', function ($request, $response, $args) {
     $res = null;
     try {
-      // Try to create new directory
       $new_dir = $_POST['new_dir_name'];
       $createdDir = $this->upload->newDir($new_dir, IMGDIR);
       $body = $response->getBody();

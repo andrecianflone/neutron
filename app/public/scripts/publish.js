@@ -457,20 +457,26 @@ function printResult(msg){
 // Capture some upload form buttons
 // List all images in the folder
 $( "#list_img" ).click(function() {
-  // Get current selection value
-  dir = $('#dir_sel').val();
-  // TODO
-  // Get list of files in directory with ajax and list in preview
+  result = $('#preview'); // where to print results
+  error_out = result;
+  var formData = new FormData(document.querySelector('#upload_file'));
   $.ajax({
-    url: "upload/listfiles",
+    url: "listfiles",
     type: 'POST',
-    data: dir,
+    data: formData,
     cache: false,
     contentType: false,
     enctype: 'multipart/form-data',
     processData: false,
+    beforeSend: function() {
+      result.empty();
+      error_out.empty();
+    },
     success: function(data, textStatus, jqXHR) {
-      result.append('Successfully uploaded files: ' + data);
+      result.append('Files in directory: <br>');
+      $.each(data, function(i, item) {
+        result.append(item + '<br>');
+      });
     },
     error: function(xhr, textStatus, error) {
       // Handle errors
