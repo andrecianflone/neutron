@@ -21,6 +21,32 @@ class Upload {
   }
 
   /**
+   * Create a new directory
+   */
+  public function newDir($directory, $parentDir) {
+    // Directory name cleaning
+    $directory = preg_replace('/\//', '', $directory); //remove slash
+    $directory = trim($directory); // remove leading/trailing whitespace
+
+    // Check if non valid chars: should only be alpha-num and underscore
+    if (preg_match("/[^\w]/", $directory)) {
+      throw new \Exception("'{$directory}' is not a valid name");
+    }
+
+    $directory = $parentDir . $directory; // create full path name
+
+    // Check if dir already exists
+    if (file_exists($directory)) {
+      throw new \Exception("Directory {$directory} already exists");
+    }
+
+    // Create dir
+    mkdir($directory, 0700);
+
+    return $directory;
+  }
+
+  /**
    * Get an array of directories in passed directory
    */
   public function dirsInDirectory($directory) {

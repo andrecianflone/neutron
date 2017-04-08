@@ -326,6 +326,26 @@ $app->group('/publish', function() use ($app){
       $this->upload->validate($_FILES, $target_dir);
       // Try to upload the files
       $res = $this->upload->uploadImage($_FILES, $target_dir);
+      return $response->withStatus(200);
+    } catch (Exception $e){
+      $err = $e->getMessage();
+      $body = $response->getBody();
+      $body->write($err);
+      $newResponse = $response->withStatus(500)->withBody($body);
+      return $newResponse;
+    }
+    return $res;
+  });
+
+  $app->post('/new_dir', function ($request, $response, $args) {
+    $res = null;
+    try {
+      // Try to create new directory
+      $new_dir = $_POST['new_dir_name'];
+      $createdDir = $this->upload->newDir($new_dir, IMGDIR);
+      $body = $response->getBody();
+      $body->write($createdDir);
+      return $response->withStatus(200)->withBody($body);
     } catch (Exception $e){
       $err = $e->getMessage();
       $body = $response->getBody();

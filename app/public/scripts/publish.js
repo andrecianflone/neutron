@@ -482,21 +482,22 @@ $( "#list_img" ).click(function() {
 });
 
 // Create new dir using value in text field
-$( "#new_dir" ).click(function() {
+$("#new_dir").click(function() {
+  result = $('#preview'); // where to print results
+  error_out = $('#preview');
   // Get current selection value
-  dir = $('#newDirText').val();
-  // TODO
-  // Get list of files in directory with ajax and list in preview
+  var formData = new FormData(document.querySelector('#upload_file'));
+  //dir = $('#newDirText').val();
   $.ajax({
-    url: "upload/listfiles",
+    url: "new_dir",
     type: 'POST',
-    data: dir,
+    data: formData,
     cache: false,
     contentType: false,
     enctype: 'multipart/form-data',
     processData: false,
     success: function(data, textStatus, jqXHR) {
-      result.append('Successfully uploaded files: ' + data);
+      result.append('Successfully created directory: ' + data.responseText);
     },
     error: function(xhr, textStatus, error) {
       // Handle errors
