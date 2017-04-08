@@ -41,7 +41,7 @@ class Upload {
     }
 
     // Create dir
-    mkdir($directory, 0700);
+    mkdir($directory, 0755);
 
     return $directory;
   }
