@@ -7,9 +7,11 @@ class Article {
    * database var
    * @var PDO
    * @var Parsedown
+   * @var string
    */
   private $db;
   private $parse;
+  private $getArticleQuery;
 
   /**
    * Pass the $db object from app object
@@ -19,13 +21,15 @@ class Article {
   function __construct($db, $parse) {
     $this->db = $db;
     $this->parse = $parse;
+    // Common query to get article
+    $this->getArticleQuery = "SELECT id, author, title, url, blurb, category, tags, dt_display, body, published, parse_math FROM pages ";
   }
 
   /**
    * Get single article by id
    */
   public function getArticleByUrl($url) {
-    $sql  = "SELECT id, title, url, blurb, body, parse_math, author FROM pages ";
+    $sql = $this->getArticleQuery;
     $sql .= " WHERE url = :url";
     $query = $this->db->prepare($sql);
     $params = array(':url' => $url);
@@ -37,7 +41,7 @@ class Article {
    * Get single article by id
    */
   public function getArticleById($id) {
-    $sql  = "SELECT id, title, url, blurb, body, published, parse_math FROM pages ";
+    $sql = $this->getArticleQuery;
     $sql .= " WHERE id = :id";
     $query = $this->db->prepare($sql);
     $params = array(':id' => $id);
@@ -50,7 +54,7 @@ class Article {
    * Optionally slice each article body, keep beginning
    */
   public function getAllArticles($only_published=false, $slice=null, $order=null) {
-    $sql = "SELECT id, blurb, title, body, url, parse_math, author FROM pages";
+    $sql = $this->getArticleQuery;
     //if ($only_published) {$sql .= " WHERE url like 'setup_dl_machine'";}
     if ($only_published) {$sql .= " WHERE published = TRUE";}
     if ($order) {$sql .= " ORDER BY " . $order;}

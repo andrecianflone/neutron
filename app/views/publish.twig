@@ -11,6 +11,14 @@
   <form method="post" action="" id="publish_form">
 
     <div class="form-group">
+      <label for="category">Category:</label>
+      <select class="form-control" id="category" name="category">
+        <option value = "null">Select a category</option>
+        {% for page in currentPages %}
+          <option value="{{ page.category }}">{{ page.category }} </option>
+        {% endfor %}
+      </select>
+
       <label for="update_art">Update article:</label>
       <select class="form-control" id="article_sel" name="article_sel">
         <option value = "null">Select article to update</option>
