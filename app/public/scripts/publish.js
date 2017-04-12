@@ -354,7 +354,11 @@ function loadFromSelectedArticle(elem) {
         $("#title").val(data.title);
         $("#blurb").val(data.blurb);
         $("#body").val(data.body);
-        $("#set_category").val(data.category);
+        var cat = data.category;
+        if (cat == null || cat == '') {
+          cat = "null";
+        }
+        $("#set_category").val(cat);
         // Capture published state as boolean
         var published = data.published == 1 ? true : false;
         $("#is_published").prop("checked", published);
