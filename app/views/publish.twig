@@ -11,11 +11,12 @@
   <form method="post" action="" id="publish_form">
 
     <div class="form-group">
-      <label for="category">Category:</label>
+      <label for="category_title">Category:</label>
       <select class="form-control" id="category" name="category">
-        <option value = "null">Select a category</option>
-        {% for page in currentPages %}
-          <option value="{{ page.category }}">{{ page.category }} </option>
+        <option value = "all">Select a category</option>
+        <option value = "null">[uncategorized]</option>
+        {% for cat in categories %}
+          <option value="{{ cat.category }}">{{ cat.category }} </option>
         {% endfor %}
       </select>
 
@@ -32,6 +33,17 @@
     <div class = "checkbox">
       <label><input type="checkbox" id="is_published" name="is_published" value="">published</label>
       <label><input type="checkbox" id="parse_math" name="parse_math" value="">has math</label>
+    </div>
+
+    <div class="form-group">
+      <label for="set_category">Set Category:</label>
+      <select class="form-control" id="set_category" name="set_category">
+        <option value = "all">Select a category</option>
+        <option value = "null">[uncategorized]</option>
+        {% for cat in categories %}
+          <option value="{{ cat.category }}">{{ cat.category }} </option>
+        {% endfor %}
+      </select>
     </div>
 
     <div class="form-group">

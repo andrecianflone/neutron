@@ -277,9 +277,11 @@ $app->group('/publish', function() use ($app){
   // Load publish page
   $app->get('/', function ($request, $response, $args) {
     $currentPages = $this->article->getAllArticles(false, null, 'title');
+    $categories = $this->article->getAllCategories();
     $directories = $this->upload->dirsInDirectory(IMGDIR);
     return $this->view->render($response, 'publish.twig', [
       'currentPages' => $currentPages,
+      'categories' => $categories,
       'directories' => $directories
     ]);
   });
@@ -290,14 +292,22 @@ $app->group('/publish', function() use ($app){
     $published = (isset($_POST['is_published'])) ? 1 : 0;
     $parse_math = (isset($_POST['parse_math'])) ? 1 : 0;
     $res = $this->article->addNewArticle(
-            $_POST['title'], $_POST['url'], $_POST['blurb'],
-            $_POST['body'], $published, $parse_math);
+      $_POST['title'], $_POST['url'], $_POST['set_category'],
+      $_POST['blurb'],$_POST['body'], $published, $parse_math
+    );
     //return $res;
     if ($res === TRUE) {
       return " Article added: " . $_POST['title'];
     } else {
       return "Error: " . $res;
     }
+  });
+
+  // Return JSON of {id: title} in category
+  $app->get('/getpagesfromcategory/{category}', function ($request, $response, $args) {
+    $articles = $this->article->getArticleTitles($args['category']);
+    $newResponse = $response->withJson($articles); // return only one json
+    return $newResponse;
   });
 
   // Return json data for page by using its id
@@ -380,7 +390,8 @@ $app->group('/publish', function() use ($app){
     $parse_math = (isset($_POST['parse_math'])) ? 1 : 0;
     $res = $this->article->updateArticle(
             $_POST['article_sel'], $_POST['title'], $_POST['url'],
-            $_POST['blurb'], $_POST['body'], $published, $parse_math);
+            $_POST['set_category'],$_POST['blurb'], $_POST['body'],
+            $published, $parse_math);
     //return $res;
     if ($res === TRUE) {
       return " Article updated at " . date('h:i:sa');

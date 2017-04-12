@@ -309,11 +309,44 @@ $(function() { //shorthand document.ready function
 });
 
 // When a webpage is selected from the dropdown, load content in form
+$('#category').on('change', function() {
+  loadArticlesFromSelectedCategory($('#category'));
+});
+function loadArticlesFromSelectedCategory(elem) {
+  $.getJSON('getpagesfromcategory/' + elem.val(), null,
+    function(j) {
+      var options = '';
+      for (var i = 0; i < j.length; i++) {
+        options += '<option value="' + j[i].id + '">' + j[i].title + '</option>';
+      }
+      $("select#article_sel").html(options);
+      // Flush preview window
+      $("#preview").empty();
+      loadFromSelectedArticle($('#article_sel'));
+    });
+}
+
+function clearForm() {
+  $("#url").val('');
+  $("#title").val('');
+  $("#blurb").val('');
+  $("#body").val('');
+  $("#is_published").prop("checked", false);
+  $("#parse_math").prop("checked", false);
+  // Paste body to editor
+  var editor = ace.edit('editor');
+  editor.getSession().setValue('');
+  // Flush preview window
+  $("#preview").empty();
+}
+
+// When a webpage is selected from the dropdown, load content in form
 $('#article_sel').on('change', function() {
-  loadFromDropDown($('#article_sel'));
+  loadFromSelectedArticle($('#article_sel'));
 });
 
-function loadFromDropDown(elem) {
+function loadFromSelectedArticle(elem) {
+  clearForm();
   if (elem.val() != "null") {
     $.getJSON('getpage/' + elem.val(), null,
       function(data){
@@ -321,6 +354,7 @@ function loadFromDropDown(elem) {
         $("#title").val(data.title);
         $("#blurb").val(data.blurb);
         $("#body").val(data.body);
+        $("#set_category").val(data.category);
         // Capture published state as boolean
         var published = data.published == 1 ? true : false;
         $("#is_published").prop("checked", published);

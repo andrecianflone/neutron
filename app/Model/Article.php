@@ -26,6 +26,46 @@ class Article {
   }
 
   /**
+   * Get list of available categories
+   */
+  public function getAllCategories() {
+    $sql = "SELECT category FROM categories";
+    $query = $this->db->prepare($sql);
+    $query->execute();
+    return $query->fetchAll();
+  }
+
+  /**
+   * Return list of article id and title in a category
+   * If category is null, return titles with no category
+   * If no category parameter, returns all titles
+   */
+  public function getArticleTitles($category = 'all') {
+    $sql  = "SELECT id, title from pages ";
+
+    // If all, no 'WHERE' statement
+    if ($category != 'all') {
+      $sqlWhere = "WHERE category = :category ";
+    }
+    if ($category == 'null') {
+      $sqlWhere = "WHERE category is :category";
+    }
+    $sql .= $sqlWhere;
+    $query = $this->db->prepare($sql);
+
+    // Set query parameters
+    if ($category != 'all') {
+      if ($category == 'null') {
+        $query->bindValue(':category', NULL, \PDO::PARAM_INT);
+      } else {
+        $query->bindValue(':category', $category, \PDO::PARAM_STR);
+      }
+    }
+    $query->execute();
+    return $query->fetchAll();
+  }
+
+  /**
    * Get single article by id
    */
   public function getArticleByUrl($url) {
@@ -72,17 +112,27 @@ class Article {
   /**
    * Add new article
    */
-  public function addNewArticle($title, $url, $blurb, $body, $published, $parse_math) {
-    $sql  = "INSERT INTO pages (title, url, blurb, body, published, parse_math, dt_created) ";
-    $sql .= "VALUES (:title, :url, :blurb, :body, :published, :parse_math, NOW())";
+  public function addNewArticle($title, $url, $category, $blurb, $body,
+        $published, $parse_math) {
+    // Prepare query
+    $sql  = "INSERT INTO pages (title, url, category, blurb, body, published, parse_math, dt_created) ";
+    $sql .= "VALUES (:title, :url, :category, :blurb, :body, :published, :parse_math, NOW())";
     $query = $this->db->prepare($sql);
-    $params = array(
-      ':title'     => $title,
-      ':url'       => $url,
-      ':blurb'     => $blurb,
-      ':body'      => $body,
-      ':published' => $published,
-      ':parse_math'=> $parse_math);
+
+    // Set query parameters
+    $query->bindValue(':title', $title, \PDO::PARAM_STR);
+    $query->bindValue(':url', $url, \PDO::PARAM_STR);
+    if ($category == 'null') {
+      $query->bindValue(':category', null, \PDO::PARAM_INT);
+    } else {
+      $query->bindValue(':category', $category, \PDO::PARAM_STR);
+    }
+    $query->bindValue(':blurb', $blurb, \PDO::PARAM_STR);
+    $query->bindValue(':body', $body, \PDO::PARAM_STR);
+    $query->bindValue(':published', $published, \PDO::PARAM_INT);
+    $query->bindValue(':parse_math', $parse_math, \PDO::PARAM_INT);
+
+    // Execute the query
     try {
       $query->execute($params);
     }
@@ -98,24 +148,36 @@ class Article {
   /**
    * Update article
    */
-  public function updateArticle($id, $title, $url, $blurb, $body, $published, $parse_math) {
+  public function updateArticle($id, $title, $url, $category, $blurb, $body,
+          $published, $parse_math) {
     $sql  = "UPDATE pages SET ";
     $sql .= "title = :title, ";
     $sql .= "url = :url, ";
+    $sql .= "category = :category, ";
     $sql .= "blurb = :blurb, ";
     $sql .= "body = :body, ";
     $sql .= "published = :published, ";
     $sql .= "parse_math = :parse_math ";
     $sql .= "WHERE id = :id ";
     $query = $this->db->prepare($sql);
-    $params = array(
-      ':id' => $id, ':title' => $title,
-      ':url' => $url, ':blurb' => $blurb,
-      ':body' => $body, ':published' => $published,
-      ':parse_math' => $parse_math
-    );
+
+    // Set query parameters
+    $query->bindValue(':id', $id, \PDO::PARAM_INT);
+    $query->bindValue(':title', $title, \PDO::PARAM_STR);
+    $query->bindValue(':url', $url, \PDO::PARAM_STR);
+    if ($category == 'null') {
+      $query->bindValue(':category', null, \PDO::PARAM_INT);
+    } else {
+      $query->bindValue(':category', $category, \PDO::PARAM_STR);
+    }
+    $query->bindValue(':blurb', $blurb, \PDO::PARAM_STR);
+    $query->bindValue(':body', $body, \PDO::PARAM_STR);
+    $query->bindValue(':published', $published, \PDO::PARAM_INT);
+    $query->bindValue(':parse_math', $parse_math, \PDO::PARAM_INT);
+
+    // Execute the query
     try {
-      $query->execute($params);
+      $query->execute();
     }
     catch(PDOException $e) {
       return $e->getMessage() . $sql;
