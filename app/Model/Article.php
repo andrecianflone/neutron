@@ -61,6 +61,7 @@ class Article {
         $query->bindValue(':category', $category, \PDO::PARAM_STR);
       }
     }
+    //print_r($query);
     $query->execute();
     return $query->fetchAll();
   }
