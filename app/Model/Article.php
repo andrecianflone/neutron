@@ -135,7 +135,7 @@ class Article {
 
     // Execute the query
     try {
-      $query->execute($params);
+      $query->execute();
     }
     catch(PDOException $e) {
       return $e->getMessage();
