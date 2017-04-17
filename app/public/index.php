@@ -36,6 +36,8 @@ $config['db']['pass']   = $site_ini['db']['pass'];
 $config['db']['dbname'] = $site_ini['db']['dbname'];
 $config['disqus']['enable'] = $site_ini['disqus']['enable'];
 $config['disqus']['forum_name'] = $site_ini['disqus']['forum_name'];
+$config['analytics']['enable'] = $site_ini['analytics']['enable'];
+$config['analytics']['script'] = $site_ini['analytics']['script'];
 
 // New Slim app object with the configs
 $app = new \Slim\App(["settings" => $config]);
@@ -114,6 +116,14 @@ $container['article'] = function ($container) {
   return $model;
 };
 
+// Setup Analytics
+$container['analytics'] = function ($container) {
+  $enabled = $container['settings']['analytics']['enable'];
+  $script = $container['settings']['analytics']['script'];
+  $model = new Neutron\Model\Analytics($enabled, $script);
+  return $model;
+};
+
 // Math down model, to parse Latex math
 $container['upload'] = function ($container) {
   $model = new Neutron\Model\Upload();
@@ -170,8 +180,10 @@ $app->get('/', function (Request $request, Response $response) {
   $blurb = "";
   // Get all articles that are published -> true, l
   $articles = $this->article->getAllArticles(true, 1000, "`dt_display` DESC");
+  $analytics = $this->analytics->getScript();
 
-  $newArgs = ["title" => $title, "blurb" => $blurb, "articles" => $articles];
+  $newArgs = ["title" => $title, "blurb" => $blurb, "articles" => $articles,
+              "analytics" => $analytics];
   $response = $this->view->render($response, "index.twig", $newArgs);
   return $response;
 });
@@ -182,6 +194,7 @@ $app->get('/article/{url}', function ($request, $response, $args) {
   $parse_math = $article->parse_math == '1' ? 1 : 0;
   $rend_body = $article->body;
   $comments = $this->article->getComments($article);
+  $analytics = $this->analytics->getScript();
   if($parse_math) {
     $rend_body = $this->mathdown->parsemath_pre($rend_body);
     $rend_body = $this->parsedown->text($rend_body);
@@ -195,7 +208,8 @@ $app->get('/article/{url}', function ($request, $response, $args) {
     'blurb' => $article->blurb,
     'author' => $article->author,
     'content' => $rend_body,
-    'comments' => $comments
+    'comments' => $comments,
+    'analytics' => $analytics
   ]);
 });
 
