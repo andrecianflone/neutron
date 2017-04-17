@@ -12,17 +12,53 @@ class Article {
   private $db;
   private $parse;
   private $getArticleQuery;
+  private $disqus_enabled;
+  private $disqus_forum_name;
 
   /**
    * Pass the $db object from app object
    * @param $db
    */
 
-  function __construct($db, $parse) {
+  function __construct($db, $parse, $disqus_config) {
     $this->db = $db;
     $this->parse = $parse;
     // Common query to get article
     $this->getArticleQuery = "SELECT id, author, title, dt_display, tags, url, blurb, category, tags, dt_display, body, published, parse_math FROM pages ";
+    $this->disqus_enabled = $disqus_config['enable'];
+    $this->disqus_forum_name = $disqus_config['forum_name'];
+  }
+
+  /**
+   * Return Disqus comments if enabled
+   */
+  public function getComments($article) {
+    if ($this->disqus_enabled == "true" and $this->disqus_forum_name != "") {
+      $canonical = "http://www.proximacent.com/article/" . $article->url;
+      $id = $article->id;
+      $forum_name = $this->disqus_forum_name;
+      $comments = <<<EOS
+<div id="disqus_thread"></div>
+<script>
+
+var disqus_config = function () {
+  this.page.url = '$canonical';
+  this.page.identifier = $id;
+};
+
+(function() { // DON'T EDIT BELOW THIS LINE
+  var d = document, s = d.createElement('script');
+  s.src = 'https://$forum_name.disqus.com/embed.js';
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+EOS;
+      return $comments;
+    } else {
+      return "";
+    }
   }
 
   /**

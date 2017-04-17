@@ -34,6 +34,8 @@ $config['db']['host']   = $site_ini['db']['host'];
 $config['db']['user']   = $site_ini['db']['user'];
 $config['db']['pass']   = $site_ini['db']['pass'];
 $config['db']['dbname'] = $site_ini['db']['dbname'];
+$config['disqus']['enable'] = $site_ini['disqus']['enable'];
+$config['disqus']['forum_name'] = $site_ini['disqus']['forum_name'];
 
 // New Slim app object with the configs
 $app = new \Slim\App(["settings" => $config]);
@@ -107,7 +109,8 @@ $container['parsedown'] = function ($container) {
 $container['article'] = function ($container) {
   $db = $container->get('db');
   $parse = $container->get('parsedown');
-  $model = new Neutron\Model\Article($db, $parse);
+  $disqus_config = $container['settings']['disqus'];
+  $model = new Neutron\Model\Article($db, $parse, $disqus_config);
   return $model;
 };
 
@@ -178,6 +181,7 @@ $app->get('/article/{url}', function ($request, $response, $args) {
   $article = $this->article->getArticleByUrl($args['url'])[0];
   $parse_math = $article->parse_math == '1' ? 1 : 0;
   $rend_body = $article->body;
+  $comments = $this->article->getComments($article);
   if($parse_math) {
     $rend_body = $this->mathdown->parsemath_pre($rend_body);
     $rend_body = $this->parsedown->text($rend_body);
@@ -190,7 +194,8 @@ $app->get('/article/{url}', function ($request, $response, $args) {
     'dt_display' => $article->dt_display,
     'blurb' => $article->blurb,
     'author' => $article->author,
-    'content' => $rend_body
+    'content' => $rend_body,
+    'comments' => $comments
   ]);
 });
 
