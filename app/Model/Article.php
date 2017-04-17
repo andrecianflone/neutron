@@ -113,8 +113,8 @@ class Article {
   /**
    * Add new article
    */
-  public function addNewArticle($title, $url, $category, $blurb, $body,
-        $published, $parse_math) {
+  public function addNewArticle($title, $url, $category, $dt_display, $tags,
+      $blurb, $body, $published, $parse_math) {
     // Prepare query
     $sql  = "INSERT INTO pages (title, url, category, dt_display, tags, blurb, body, published, parse_math, dt_created) ";
     $sql .= "VALUES (:title, :url, :category, :dt_display, :tags, :blurb, :body, :published, :parse_math, NOW())";
@@ -122,8 +122,8 @@ class Article {
 
     // Set query parameters
     $query->bindValue(':title', $title, \PDO::PARAM_STR);
-    $query->bindValue(':dt_display', $url, \PDO::PARAM_STR);
-    $query->bindValue(':tags', $url, \PDO::PARAM_STR);
+    $query->bindValue(':dt_display', $dt_display, \PDO::PARAM_STR);
+    $query->bindValue(':tags', $tags, \PDO::PARAM_STR);
     $query->bindValue(':url', $url, \PDO::PARAM_STR);
     if ($category == 'null') {
       $query->bindValue(':category', null, \PDO::PARAM_INT);
@@ -169,8 +169,8 @@ class Article {
     // Set query parameters
     $query->bindValue(':id', $id, \PDO::PARAM_INT);
     $query->bindValue(':title', $title, \PDO::PARAM_STR);
-    $query->bindValue(':dt_display', $title, \PDO::PARAM_STR);
-    $query->bindValue(':tags', $title, \PDO::PARAM_STR);
+    $query->bindValue(':dt_display', $dt_display, \PDO::PARAM_STR);
+    $query->bindValue(':tags', $tags, \PDO::PARAM_STR);
     $query->bindValue(':url', $url, \PDO::PARAM_STR);
     if ($category == 'null') {
       $query->bindValue(':category', null, \PDO::PARAM_INT);

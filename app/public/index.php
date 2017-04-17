@@ -292,8 +292,8 @@ $app->group('/publish', function() use ($app){
     $published = (isset($_POST['is_published'])) ? 1 : 0;
     $parse_math = (isset($_POST['parse_math'])) ? 1 : 0;
     $res = $this->article->addNewArticle(
-      $_POST['title'], $_POST['url'], $_POST['set_category'],
-      $_POST['blurb'],$_POST['body'], $published, $parse_math
+      $_POST['title'], $_POST['url'], $_POST['set_category'],$_POST['dt_display'],
+      $_POST['tags_set'],$_POST['blurb'],$_POST['body'], $published, $parse_math
     );
     //return $res;
     if ($res === TRUE) {

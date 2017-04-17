@@ -366,7 +366,10 @@ function loadFromSelectedArticle(elem) {
       function(data){
         $("#url").val(data.url);
         $("#title").val(data.title);
-        $("#dt_display").val(data.dt_display);
+        raw = data.dt_display.split(" ");
+        dt = raw[0].split("-");
+        dt = dt[0] + "-" + dt[1] + "-" + dt[2];
+        $("#dt_display").val(dt);
         $("#tags_set").val(data.tags);
         $("#blurb").val(data.blurb);
         $("#body").val(data.body);
