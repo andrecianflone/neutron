@@ -21,6 +21,16 @@
       </select>
 
       <label for="update_art">Update article:</label>
+
+      <div class='center' style="float: right;">
+        <label class="radio-inline">
+          <input id='sortByDate' type="radio" name="sortArticle" value="date" >date
+        </label>
+        <label class="radio-inline">
+          <input id='sortByTitle' type="radio" name="sortArticle" value="title" checked="checked">title
+        </label>
+      </div>
+
       <select class="form-control" id="article_sel" name="article_sel">
         <option value = "null">Select article to update</option>
         {% for page in currentPages %}
@@ -74,15 +84,15 @@
     <div id="body_group" class="form-group">
       <label for="body">Body: </label>
       <div class='center' style="float: right;">
-      <label class="radio-inline">
-        <input id='radioAuto' type="radio" name="optradio" value="auto" checked="checked">auto
-      </label>
-      <label class="radio-inline">
-        <input id='radioSplit' type="radio" name="optradio" value="split">split
-      </label>
-      <label class="radio-inline">
-        <input id='radioStack' type="radio" name="optradio" value="stack">stack
-      </label>
+        <label class="radio-inline">
+          <input id='radioAuto' type="radio" name="optradio" value="auto" checked="checked">auto
+        </label>
+        <label class="radio-inline">
+          <input id='radioSplit' type="radio" name="optradio" value="split">split
+        </label>
+        <label class="radio-inline">
+          <input id='radioStack' type="radio" name="optradio" value="stack">stack
+        </label>
       </div>
       <div id="resizable">
         <h3 class="ui-widget-header">Ace Editor</h3>

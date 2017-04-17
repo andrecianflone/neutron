@@ -314,10 +314,11 @@ $('#category').on('change', function() {
   loadArticlesFromSelectedCategory($('#category'), $('#article_sel'));
 });
 // Load all article id/title from category
-function loadArticlesFromSelectedCategory(source, target) {
+function loadArticlesFromSelectedCategory(source, target, sort) {
+  if (typeof(sort)==='undefined') sort = " title ASC";
   error_out = $('#preview');
   $.ajax({
-      url: 'getpagesfromcategory/' + source.val(),
+      url: 'getpagesfromcategory/' + source.val() + '/' + sort,
       type: 'GET',
       dataType: 'json',
       success: function(j) {
@@ -345,6 +346,22 @@ function loadArticlesFromSelectedCategory(source, target) {
       }
   });
 }
+
+// Sort the list
+$(document).ready(function() {
+  $('input[type=radio][name=sortArticle]').change(function() {
+    sort = '';
+    if (this.value == 'date') {
+      sort = "`dt_display` DESC";
+    }
+    else if (this.value == 'title') {
+      sort = "`title` ASC";
+    }
+    source = $('#category');
+    target = $('#article_sel');
+    loadArticlesFromSelectedCategory(source, target, sort) ;
+  });
+});
 
 function clearForm() {
   $("#url").val('');

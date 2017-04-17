@@ -76,7 +76,7 @@ EOS;
    * If category is null, return titles with no category
    * If no category parameter, returns all titles
    */
-  public function getArticleTitles($category = 'all') {
+  public function getArticleTitles($category = 'all', $order=null) {
     $sql  = "SELECT id, title from pages ";
     $sqlWhere = "";
 
@@ -88,6 +88,7 @@ EOS;
       $sqlWhere = "WHERE category is :category";
     }
     $sql .= $sqlWhere;
+    if ($order) {$sql .= " ORDER BY " . $order;}
     $query = $this->db->prepare($sql);
 
     // Set query parameters

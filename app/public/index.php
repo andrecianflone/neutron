@@ -310,9 +310,9 @@ $app->group('/publish', function() use ($app){
   });
 
   // Return JSON of {id: title} in category
-  $app->get('/getpagesfromcategory/{category}', function ($request, $response, $args) {
+  $app->get('/getpagesfromcategory/{category}/{sort}', function ($request, $response, $args) {
     try {
-      $articles = $this->article->getArticleTitles($args['category']);
+      $articles = $this->article->getArticleTitles($args['category'], $args['sort']);
       $newResponse = $response->withJson($articles); // return only one json
       return $newResponse;
     } catch (Exception $e){
