@@ -166,7 +166,7 @@ $app->get('/', function (Request $request, Response $response) {
   $title = "";
   $blurb = "";
   // Get all articles that are published -> true, l
-  $articles = $this->article->getAllArticles(true, 1000, "`dt_created` DESC");
+  $articles = $this->article->getAllArticles(true, 1000, "`dt_display` DESC");
 
   $newArgs = ["title" => $title, "blurb" => $blurb, "articles" => $articles];
   $response = $this->view->render($response, "index.twig", $newArgs);
@@ -187,6 +187,7 @@ $app->get('/article/{url}', function ($request, $response, $args) {
   }
   return $this->view->render($response, 'article.twig', [
     'title' => $article->title,
+    'dt_display' => $article->dt_display,
     'blurb' => $article->blurb,
     'author' => $article->author,
     'content' => $rend_body
@@ -305,9 +306,17 @@ $app->group('/publish', function() use ($app){
 
   // Return JSON of {id: title} in category
   $app->get('/getpagesfromcategory/{category}', function ($request, $response, $args) {
-    $articles = $this->article->getArticleTitles($args['category']);
-    $newResponse = $response->withJson($articles); // return only one json
-    return $newResponse;
+    try {
+      $articles = $this->article->getArticleTitles($args['category']);
+      $newResponse = $response->withJson($articles); // return only one json
+      return $newResponse;
+    } catch (Exception $e){
+      $err = $e->getMessage();
+      $body = $response->getBody();
+      $body->write($err);
+      $newResponse = $response->withStatus(500)->withBody($body);
+      return $newResponse;
+    }
   });
 
   // Return json data for page by using its id

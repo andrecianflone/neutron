@@ -42,6 +42,7 @@ class Article {
    */
   public function getArticleTitles($category = 'all') {
     $sql  = "SELECT id, title from pages ";
+    $sqlWhere = "";
 
     // If all, no 'WHERE' statement
     if ($category != 'all') {

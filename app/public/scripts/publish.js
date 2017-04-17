@@ -310,39 +310,47 @@ $(function() { //shorthand document.ready function
 
 // When a webpage is selected from the dropdown, load content in form
 $('#category').on('change', function() {
-  loadArticlesFromSelectedCategory($('#category'), $('#article_sel'));
   clearForm();
+  loadArticlesFromSelectedCategory($('#category'), $('#article_sel'));
 });
 // Load all article id/title from category
 function loadArticlesFromSelectedCategory(source, target) {
-  $.getJSON('getpagesfromcategory/' + source.val(), null,
-    function(j) {
-      var options = '';
-      // Clear selection
-      target.empty();
-      // Add default
-      target.append($('<option>', {
-            value: "null",
-            text: "Select article to update"
-      }));
-      // Add returned values
-      for (var i = 0; i < j.length; i++) {
+  error_out = $('#preview');
+  $.ajax({
+      url: 'getpagesfromcategory/' + source.val(),
+      type: 'GET',
+      dataType: 'json',
+      success: function(j) {
+        var options = '';
+        // Clear selection
+        target.empty();
+        // Add default
         target.append($('<option>', {
-              value: j[i].id,
-              text: j[i].title
+              value: "null",
+              text: "Select article to update"
         }));
-        //options += '<option value="' + j[i].id + '">' + j[i].title + '</option>';
+        // Add returned values
+        for (var i = 0; i < j.length; i++) {
+          target.append($('<option>', {
+                value: j[i].id,
+                text: j[i].title
+          }));
+        }
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        error_out.empty();
+        error_out.append(xhr.status);
+        error_out.append(thrownError);
+        error_out.append(xhr.responseText);
       }
-      //$("select#article_sel").html(options);
-      // Flush preview window
-      $("#preview").empty();
-      //loadFromSelectedArticle($('#article_sel'));
-    });
+  });
 }
 
 function clearForm() {
   $("#url").val('');
   $("#title").val('');
+  $("#tags_set").val('');
+  $("#dt_display").val('');
   $("#blurb").val('');
   $("#body").val('');
   $("#is_published").prop("checked", false);
