@@ -389,9 +389,9 @@ $app->group('/publish', function() use ($app){
     $published = (isset($_POST['is_published'])) ? 1 : 0;
     $parse_math = (isset($_POST['parse_math'])) ? 1 : 0;
     $res = $this->article->updateArticle(
-            $_POST['article_sel'], $_POST['title'], $_POST['url'],
-            $_POST['set_category'],$_POST['blurb'], $_POST['body'],
-            $published, $parse_math);
+       $_POST['article_sel'], $_POST['title'], $_POST['set_category'],
+       $_POST['dt_display'], $_POST['tags_set'],$_POST['url'], $_POST['blurb'],
+       $_POST['body'],$published, $parse_math);
     //return $res;
     if ($res === TRUE) {
       return " Article updated at " . date('h:i:sa');

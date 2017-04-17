@@ -22,7 +22,7 @@ class Article {
     $this->db = $db;
     $this->parse = $parse;
     // Common query to get article
-    $this->getArticleQuery = "SELECT id, author, title, url, blurb, category, tags, dt_display, body, published, parse_math FROM pages ";
+    $this->getArticleQuery = "SELECT id, author, title, dt_display, tags, url, blurb, category, tags, dt_display, body, published, parse_math FROM pages ";
   }
 
   /**
@@ -116,12 +116,14 @@ class Article {
   public function addNewArticle($title, $url, $category, $blurb, $body,
         $published, $parse_math) {
     // Prepare query
-    $sql  = "INSERT INTO pages (title, url, category, blurb, body, published, parse_math, dt_created) ";
-    $sql .= "VALUES (:title, :url, :category, :blurb, :body, :published, :parse_math, NOW())";
+    $sql  = "INSERT INTO pages (title, url, category, dt_display, tags, blurb, body, published, parse_math, dt_created) ";
+    $sql .= "VALUES (:title, :url, :category, :dt_display, :tags, :blurb, :body, :published, :parse_math, NOW())";
     $query = $this->db->prepare($sql);
 
     // Set query parameters
     $query->bindValue(':title', $title, \PDO::PARAM_STR);
+    $query->bindValue(':dt_display', $url, \PDO::PARAM_STR);
+    $query->bindValue(':tags', $url, \PDO::PARAM_STR);
     $query->bindValue(':url', $url, \PDO::PARAM_STR);
     if ($category == 'null') {
       $query->bindValue(':category', null, \PDO::PARAM_INT);
@@ -135,7 +137,7 @@ class Article {
 
     // Execute the query
     try {
-      $query->execute();
+    $query->execute();
     }
     catch(PDOException $e) {
       return $e->getMessage();
@@ -149,12 +151,14 @@ class Article {
   /**
    * Update article
    */
-  public function updateArticle($id, $title, $url, $category, $blurb, $body,
-          $published, $parse_math) {
+  public function updateArticle($id, $title, $category, $dt_display, $tags,
+      $url, $blurb, $body,$published, $parse_math) {
     $sql  = "UPDATE pages SET ";
     $sql .= "title = :title, ";
-    $sql .= "url = :url, ";
     $sql .= "category = :category, ";
+    $sql .= "dt_display = :dt_display, ";
+    $sql .= "tags = :tags, ";
+    $sql .= "url = :url, ";
     $sql .= "blurb = :blurb, ";
     $sql .= "body = :body, ";
     $sql .= "published = :published, ";
@@ -165,6 +169,8 @@ class Article {
     // Set query parameters
     $query->bindValue(':id', $id, \PDO::PARAM_INT);
     $query->bindValue(':title', $title, \PDO::PARAM_STR);
+    $query->bindValue(':dt_display', $title, \PDO::PARAM_STR);
+    $query->bindValue(':tags', $title, \PDO::PARAM_STR);
     $query->bindValue(':url', $url, \PDO::PARAM_STR);
     if ($category == 'null') {
       $query->bindValue(':category', null, \PDO::PARAM_INT);

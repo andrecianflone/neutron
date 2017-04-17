@@ -313,6 +313,7 @@ $('#category').on('change', function() {
   loadArticlesFromSelectedCategory($('#category'), $('#article_sel'));
   clearForm();
 });
+// Load all article id/title from category
 function loadArticlesFromSelectedCategory(source, target) {
   $.getJSON('getpagesfromcategory/' + source.val(), null,
     function(j) {
@@ -358,12 +359,15 @@ $('#article_sel').on('change', function() {
   loadFromSelectedArticle($('#article_sel'));
 });
 
+// Load page into form
 function loadFromSelectedArticle(elem) {
   if (elem.val() != "null") {
     $.getJSON('getpage/' + elem.val(), null,
       function(data){
         $("#url").val(data.url);
         $("#title").val(data.title);
+        $("#dt_display").val(data.dt_display);
+        $("#tags_set").val(data.tags);
         $("#blurb").val(data.blurb);
         $("#body").val(data.body);
         var cat = data.category;
