@@ -65,6 +65,33 @@ The website adopts Bootstrap as a CSS framework. This makes the website adaptive
 * Ace
 * Prism
 
+### Analytics
+The CMS already includes analytics for the homepage and all articles. You will need to enable analytics in the `site_config.ini` file and setup your own account, such as Google Analytics in the below.
+
+```bash
+; Google Analytics
+[analytics]
+enable = "true"
+script = "<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'YOUR UA CODE HERE', 'auto');
+  ga('send', 'pageview');
+</script>"
+```
+
+### Comments
+The CMS is configured to display DISQUS comments by default on all articles. Configure your forum name and enable comments in `site_config.ini`:
+
+```
+[disqus]
+enable = "true"
+forum_name = "proximacent"
+```
+
 ## Setup
 Setup is easy, run the following in a shell
 ``` bash
