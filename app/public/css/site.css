@@ -3,6 +3,10 @@
   max-width: 650px !important;
 }
 
+img {
+  max-width: 100%;
+}
+
 body {
   padding-bottom: 60px;
 }
