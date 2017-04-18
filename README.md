@@ -87,6 +87,7 @@ script = "<script>
 The CMS is configured to display DISQUS comments by default on all articles. Configure your forum name and enable comments in `site_config.ini`:
 
 ```
+; Comments
 [disqus]
 enable = "true"
 forum_name = "proximacent"

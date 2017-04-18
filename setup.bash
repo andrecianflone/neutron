@@ -59,6 +59,16 @@ host   = "localhost"
 user   = "root"
 pass   = "root"
 dbname = "your_database"
+
+; Comments
+[disqus]
+enable = "false"
+forum_name = "your_forum_name"
+
+; Google Analytics
+[analytics]
+enable = "false"
+script = "the script here"
 EOF
 echo "================================"
 
