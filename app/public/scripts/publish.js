@@ -8,7 +8,6 @@ $(document).ready(function() {
   // Setup ace
   editor = ace.edit('editor');
   editor.setTheme('ace/theme/monokai');
-  editor.getSession().setMode('ace/mode/java');
 
   // Setup resizable
   resizable = $("#resizable");
@@ -109,20 +108,6 @@ function addJavascript(textArea, editor) {
   });
 }
 
-// Disable page scrollbar when resizing editor
-function disableScroll() {
-  if ($(document).height() > $(window).height()) {
-    var scrollTop = ($('html').scrollTop()) ? $('html').scrollTop() : $('body').scrollTop(); // Works for Chrome, Firefox, IE...
-    $('html').addClass('noscroll').css('top',-scrollTop);
-  }
-}
-
-// Enable page scrollbar
-function enableScroll() {
-  var scrollTop = parseInt($('html').css('top'));
-  $('html').removeClass('noscroll');
-  $('html,body').scrollTop(-scrollTop);
-}
 // ------------------------------------------------------
 // SPLIT/STACK PREVIEW WINDOW
 // ------------------------------------------------------
