@@ -298,6 +298,7 @@ $('#category').on('change', function() {
   clearForm();
   loadArticlesFromSelectedCategory($('#category'), $('#article_sel'));
 });
+
 // Load all article id/title from category
 function loadArticlesFromSelectedCategory(source, target, sort) {
   if (typeof(sort)==='undefined') sort = " title ASC";

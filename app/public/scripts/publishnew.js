@@ -265,9 +265,276 @@ class SplitStack {
 class FormHandler {
   /**
    * @param {object} publishForm - dom of publish form
+   * @param {object} editor - Ace editor object
    */
-  constructor(publishForm) {
+  constructor(publishForm, editor, formBody) {
     this.publishForm = publishForm;
+    this.editor = editor;
+    this.formBody = formBody;
+    this.result = $('#result');
+    this.errorOut = $('#preview');
+
+    this.monitorSubmit();
+    monitorCategory($('#category'));
   }
 
+  /**
+   * Capture submit button for new page
+   */
+  function monitorSubmit() {
+    $(function() { //shorthand document.ready function
+      this.publishForm.on('submit', function(e) { //use on if jQuery 1.7+
+        e.preventDefault();  // Stop form from submitting normally
+
+        // First, update form with editor content
+        this.formBody.val(this.editor.getSession().getValue());
+
+        form_data = this.publishForm.serialize();
+        this.ajaxSend("send", "new", 'POST', form_data);
+
+      });
+    });
+  }
+
+  // When a webpage is selected from the dropdown, load content in form
+  function monitorCategory(category) {
+    category.on('change', function() {
+      this.clearForm();
+      loadArticlesFromSelectedCategory($('#category'), $('#article_sel'));
+    });
+  }
+
+  function loadArticlesFromSelectedCategory(source, target, sort) {
+    if (typeof(sort)==='undefined') sort = " title ASC";
+    url: 'getpagesfromcategory/' + source.val() + '/' + sort;
+    results = this.ajax(url, 'GET', 'json');
+
+    var options = '';
+    // Clear selection
+    target.empty();
+    // Add default
+    target.append($('<option>', {
+          value: "null",
+          text: "Select article to update"
+    }));
+    // Add returned values
+    for (var i = 0; i < results.length; i++) {
+      target.append($('<option>', {
+            value: results[i].id,
+            text: results[i].title
+      }));
+    }
+  }
+
+  function monitorListSort() {
+    $(document).ready(function() {
+      $('input[type=radio][name=sortArticle]').change(function() {
+        sort = '';
+        if (this.value == 'date') {
+          sort = "`dt_display` DESC";
+        }
+        else if (this.value == 'title') {
+          sort = "`title` ASC";
+        }
+        source = $('#category');
+        target = $('#article_sel');
+        loadArticlesFromSelectedCategory(source, target, sort) ;
+      });
+    });
+  }
+
+  function monitorArticleSelect() {
+    // When a webpage is selected from the dropdown, load content in form
+    $('#article_sel').on('change', function() {
+      loadFromSelectedArticle($('#article_sel'));
+    });
+  }
+
+  // Load page into form
+  function loadFromSelectedArticle(elem) {
+    if (elem.val() != "null") {
+      $.getJSON('getpage/' + elem.val(), null,
+        function(data){
+          $("#url").val(data.url);
+          $("#title").val(data.title);
+          raw = data.dt_display.split(" ");
+          dt = raw[0].split("-");
+          dt = dt[0] + "-" + dt[1] + "-" + dt[2];
+          $("#dt_display").val(dt);
+          $("#tags_set").val(data.tags);
+          $("#blurb").val(data.blurb);
+          $("#body").val(data.body);
+          var cat = data.category;
+          if (cat == null || cat == '') {
+            cat = "null";
+          }
+          $("#set_category").val(cat);
+          // Capture published state as boolean
+          var published = data.published == 1 ? true : false;
+          $("#is_published").prop("checked", published);
+
+          var parse_math = data.parse_math == 1 ? true : false;
+          $("#parse_math").prop("checked", parse_math);
+          // Paste body to editor
+          var editor = ace.edit('editor');
+          editor.getSession().setValue(data.body);
+          // Flush preview window
+          $("#preview").empty();
+        }
+      );
+    }
+  }
+
+
+  /**
+   * Setupt monitors for certain actions on the form
+   */
+  function monitorActions() {
+    // Monitor delete click
+    $('#delete').click(function() {
+      if(window.confirm('Are you sure you want to delete this article?')) {
+        this.ajaxSend('delete/ ' + $('#article_sel').val());
+      }
+    });
+
+    // Monitor Update button click
+    $('#update').click(function() {
+      this.updateArticle();
+    });
+
+    // Preview button click
+    $('#prev').click(function() {
+      this.previewArticle();
+    });
+  }
+
+  function updateArticle() {
+    // First, copy data from editor to text
+    form_body.val(this.editor.getSession().getValue());
+    formData = this.publishForm.serialize();
+    this.ajaxSend("update", 'POST', formData);
+  }
+
+  /**
+   * Returns data from the request formatted in data type asked
+   */
+  function ajaxGet(url, requestType, dataType) {
+    $.ajax({
+        url: url,
+        type: requestType,
+        dataType: dataType,
+        success: function(data) {
+          return data;
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          this.printError(xhr, thrownError);
+        }
+    });
+  }
+
+  /**
+   * @param {string} requestType - 'GET' or 'POST'
+   */
+  function ajaxSend(url, requestType, data) {
+    $.ajax({
+        url: url,
+        type: requestType,
+        data: data,
+        success: function(msg) {
+          this.printResult(msg);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          this.printError(xhr, thrownError);
+        }
+    });
+  }
+
+  function printError(xhr, error) {
+    this.printResult(error);
+    this.errorOut.empty();
+    this.errorOut.append(xhr.status);
+    this.errorOut.append(error);
+    this.errorOut.append(xhr.responseText);
+  }
+
+  function printResult(msg){
+    // Print message to #result div
+    this.result.empty().append(msg);
+    // Print message on top of the editor, and fade div
+    var overlay = $("<div id=overlay>"+msg+"</div>")
+    this.editor.append(overlay);
+    overlay.delay(3000).fadeOut();
+  }
+
+  // Output article in preview div
+  function previewArticle() {
+    // Make sure text area has latest from editor
+    this.formBody.val(this.editor.getSession().getValue());
+
+    output = $('#preview');
+    form_data = $('#publish_form').serialize();
+
+    // Get the JSON data
+    $.ajax({
+        url: "/article/parse_md",
+        type: 'POST',
+        data: form_data,
+        beforeSend: function(msg){
+          output.html("Loading...");
+        },
+        success: function(msg) {
+          // Print to the browser
+          output.empty().append(msg['body']);
+          // Fix the <code> formatting by rerunning prism
+          prismRun(); // in prism.js file
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          this.printError(xhr, thrownError);
+        }
+    });
+  }
+
+  function clearForm() {
+    $("#url").val('');
+    $("#title").val('');
+    $("#tags_set").val('');
+    $("#dt_display").val('');
+    $("#blurb").val('');
+    $("#body").val('');
+    $("#is_published").prop("checked", false);
+    $("#parse_math").prop("checked", false);
+    // Paste body to editor
+    var editor = ace.edit('editor');
+    editor.getSession().setValue('');
+    // Flush preview window
+    $("#preview").empty();
+  }
 }// end FormHandler class
+
+class Upload {
+}// end Upload class
+
+// Add a CSS to the head on the fly
+function loadExternalCSS(cssFile) {
+  if(document.createStyleSheet) {
+    try { document.createStyleSheet(cssFile); } catch (e) { }
+  }
+  else {
+    var css;
+    css         = document.createElement('link');
+    css.rel     = 'stylesheet';
+    css.type    = 'text/css';
+    css.media   = "all";
+    css.href    = cssFile;
+    document.getElementsByTagName("head")[0].appendChild(css);
+  }
+}
+
+// Add a CSS to the head on the fly
+function loadExternalJS(jsFile) {
+  var file;
+  file         = document.createElement('script');
+  file.type    = 'text/javascript';
+  file.src     = jsFile;
+  document.getElementsByTagName("head")[0].appendChild(file);
+}
