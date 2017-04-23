@@ -5,30 +5,30 @@
 class Publish {
   constructor() {
     formBody = $('#formBody');
-    resizable = $('#resizable');
+    this.resizable = $('#resizable');
     this.preview = $('#preview');
 
     // Setup Editor
-    this.editor = new Editor('editor', formBody);
+    this.editor = new Editor('editor', formBody, resizable, updateArticle, previewArticle);
     this.previewEqualEditor();
 
     // Setup Split stack
     splitStackRadio = $("input[name='optradio']:checked")
-    splitstack = new SplitStack(splitStackRadio, 1, this.preview);
+    this.splitstack = new SplitStack(splitStackRadio, 1, this.preview);
   }
 
   // Make preview aligned with editor
   function previewEqualEditor(){
     // Only resize if in split mode
-    if (stacked == 1)
+    if (this.splitstack.stacked == 1)
       return;
     // Get resizable offset from
-    resOffset = resizable.offset().top - $('#col1').offset().top;
+    resOffset = this.resizable.offset().top - $('#col1').offset().top;
     // Set col above preview equal to offset
     $('#top_col').css('height', resOffset);
 
     // Set preview size equal to resizable
-    editHeight = resizable.height();
+    editHeight = this.resizable.height();
     this.preview.css('height', editHeight);
   }
 } // end Publish
@@ -43,7 +43,7 @@ class Editor {
    * @param {function} updateArticle - editor calls this fn on update
    * @param {function} previewArticle - editor calls this fn on preview
    */
-  constructor(editorId, editorField, updateArticle, previewArticle) {
+  constructor(editorId, editorField, resizable, updateArticle, previewArticle) {
     theme = 'ace/theme/monokai';
     resizable = $("#resizable");
     this.updateArticle = updateArticle;
@@ -172,6 +172,7 @@ class SplitStack {
     this.monitorWindowResize();
 
     // Monitor radio button changes
+    this.monitorRadioChange();
 
   }
 
@@ -237,22 +238,6 @@ class SplitStack {
     this.previewEqualEditor();
   }
 
-  // Make preview aligned with editor
-  function previewEqualEditor(){
-    // Only resize if in split mode
-    if (stacked == 1)
-      return;
-    resizable = $('#resizable');
-    // Get resizable offset from
-    resOffset = resizable.offset().top - $('#col1').offset().top;
-    // Set col above preview equal to offset
-    $('#top_col').css('height', resOffset);
-
-    // Set preview size equal to resizable
-    editHeight = resizable.height();
-    this.preview.css('height', editHeight);
-  }
-
   function stackWindows() {
     if (stacked == 1)
       return;
@@ -269,52 +254,20 @@ class SplitStack {
     this.preview.removeClass('col-md-12');
     this.preview.css('overflow', '');
     $('#drag').css('top', '0');
-    stacked = 1;
+    this.stacked = 1;
   }
 
-  // Move bar
-  var isResizing = false;
-  var lastDownY = null;
-  var maxHeight = 0;
-
-  $(function () {
-    var container = $('#r_row'),
-      topcol = $('#top_col'),
-      botcol = this.preview,
-      handle = $('#drag');
-
-    // Delegate col2 mouseover to #drag
-    $('#col2').on('mousedown', '#drag', function (e) {
-      maxHeight = $("#r_row").height();
-      isResizing = true; // resize possible while mouse click
-      lastDownY = e.screenY;
-    });
-
-    $(document).on('mousemove', function (e) {
-      // we don't want to do anything if we aren't resizing.
-      if (!isResizing)
-        return;
-
-      // Reset vars in case deleted
-      container = $('#r_row');
-      topcol = $('#top_col');
-      botcol = this.preview;
-      handle = $('#drag');
-
-      var offsetVert = Math.round(e.screenY - lastDownY);
-
-      top_height = Math.min(topcol.height() + offsetVert, maxHeight);
-      bot_height = maxHeight - top_height;
-
-      topcol.css('height', top_height);
-      botcol.css('height', bot_height);
-      lastDownY = e.screenY;
-      container.css('height', maxHeight);
-      handle.css('top', top_height - handle.height());
-    }).on('mouseup', function (e) {
-      // stop resizing
-      isResizing = false;
-    });
-  });
-
 }// end SplitStack class
+
+/**
+ * Handle the form UI
+ */
+class FormHandler {
+  /**
+   * @param {object} publishForm - dom of publish form
+   */
+  constructor(publishForm) {
+    this.publishForm = publishForm;
+  }
+
+}// end FormHandler class
