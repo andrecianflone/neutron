@@ -204,6 +204,7 @@ $app->get('/article/{url}', function ($request, $response, $args) {
   }
   return $this->view->render($response, 'article.twig', [
     'title' => $article->title,
+    'url' => $args['url'],
     'dt_display' => $article->dt_display,
     'blurb' => $article->blurb,
     'author' => $article->author,
