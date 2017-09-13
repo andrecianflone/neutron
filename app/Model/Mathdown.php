@@ -7,12 +7,19 @@ namespace Neutron\Model;
  */
 class Mathdown {
 
+  public function __construct($math_mode) {
+    // Math mode should be 'katex' or 'mathjax'
+    $this->math_mode = $math_mode;
+  }
+
   /**
    * Scan text for Latex math and convert for use with Katex
    */
   public function parsemath_pre($text) {
     $result = $this->add_tags($text);
-    $result = $this->add_links($result);
+    if($this->math_mode=='katex') {
+      $result = $this->add_katex_links($result);
+    }
     return $result;
   }
 
@@ -46,18 +53,30 @@ class Mathdown {
     // Middle paren group: what we actually want to keep, we don't want the '$'
     // The rest: starts with '$', followed by minimum 1 char, ending with '$'
     $pattern1 = "/(?<!\\$)[\$]([^\$\n]+)[\$](?!\\$)/";
-    $replacement1 = "\n<div><spaninline class='math inline'>$1</spaninline></div>\n";
+    if($this->math_mode=='mathjax') {
+      $replacement1 = "\n<div><spaninline class='math inline'>\($1\)</spaninline></div>\n";
+    } else {
+      $replacement1 = "\n<div><spaninline class='math inline'>$1</spaninline></div>\n";
+    }
 
     // match multiline $$math$$:
     // Starts/Ends with two '$'
     // Must have min 1 char in between
     $pattern2 = "/[\$]{2}([^\$]+)[\$]{2}/";
-    $replacement2 = '<div><span class="math center">$1</span></div>';
+    if($this->math_mode=='mathjax') {
+      $replacement2 = '<div><span class="math center">\[$1\]</span></div>';
+    } else {
+      $replacement2 = '<div><span class="math center">$1</span></div>';
+    }
 
     // match multiline with \beg \end equation:
     // Must have the 's' option to check new lines
     $pattern3 = '/\\\begin{equation}(.+)\\\end{equation}/s';
-    $replacement3 = '<div><span class="math center">$1</span></div>';
+    if($this->math_mode=='mathjax') {
+      $replacement3 = '<div><span class="math center">\[$1\]</span></div>';
+    } else {
+      $replacement3 = '<div><span class="math center">$1</span></div>';
+    }
 
     $result = preg_replace(
         array($pattern1, $pattern2, $pattern3),
@@ -67,13 +86,13 @@ class Mathdown {
     return $result;
   }
 
+
   /**
+   * Katex Math
    * Add needed scripts/css to make the math work
    * Alternatively, you may want to use katex:
-   * https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css
-   * https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.js
    */
-  private function add_links($text) {
+  private function add_katex_links($text) {
     $text .= "\n";
     $text .= '<script type="text/javascript">';
     $text .= 'loadExternalCSS("https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css");';

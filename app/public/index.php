@@ -132,7 +132,7 @@ $container['upload'] = function ($container) {
 
 // Math down model, to parse Latex math
 $container['mathdown'] = function ($container) {
-  $model = new Neutron\Model\Mathdown();
+  $model = new Neutron\Model\Mathdown('mathjax');
   return $model;
 };
 
