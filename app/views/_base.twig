@@ -14,8 +14,24 @@
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-  <script type="text/javascript" async
-    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+  {#<script type="text/javascript" async#}
+    {#src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">#}
+  {#</script>#}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX","output/HTML-CSS"]
+  });
+  </script>
+  <script type="text/javascript">
+  <!--
+  function renderMath()
+  {
+    $( ".math" ).each(function( elem ) {
+      MathJax.Hub.Queue(["Typeset",MathJax.Hub, this ]);
+    });
+  }
+  // -->
   </script>
   <script src="/scripts/prism.js"></script>
   <script src="/scripts/site.js"></script>

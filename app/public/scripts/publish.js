@@ -473,6 +473,7 @@ function previewArticle() {
         output.empty().append(msg['body']);
         // Fix the <code> formatting by rerunning prism
         prismRun(); // in prism.js file
+        renderMath(); // parse math
       },
       error: function (xhr, ajaxOptions, thrownError) {
         error_out.empty();

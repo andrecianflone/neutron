@@ -1,4 +1,9 @@
 
+$(document).ready(function() {
+  // Once doc loaded, call mathJax
+  renderMath();
+}
+
 // Add a CSS file to the head
 function loadExternalCSS(cssFile) {
   if(document.createStyleSheet) {

@@ -1,4 +1,4 @@
-// Call Katex once resouces ready (ie, css/script dependencies)
+ Call Katex once resouces ready (ie, css/script dependencies)
 var wait_here = setInterval(function(){
   if(typeof(katex) != "undefined"){
     clearInterval(wait_here)
@@ -21,3 +21,4 @@ function loadKatex() {
     }
   });
 };
+
