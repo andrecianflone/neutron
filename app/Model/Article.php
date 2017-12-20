@@ -110,20 +110,24 @@ EOS;
   public function customMD($text) {
     // Pseudo code: match everything until first ">"
     // First capturing group is header, second is body
-    $pattern_p = "/<pseudo.*header=([^>]*)>\s(.*)<\/pseudo>/s";
-    $replacement_p = '<div class="panel panel-default">';
-    $replacement_p .= '<div class="panel-heading">$1</div>';
-    $replacement_p .= '<div class="panel-body">';
-    $replacement_p .= '$2 </div> </div>';
+    $pseudo_p = "/<pseudo.*header=([^>]*)>\s(.*)<\/pseudo>/s";
+    $pseudo_r = '<div class="panel panel-default">';
+    $pseudo_r .= '<div class="panel-heading">$1</div>';
+    $pseudo_r .= '<div class="panel-body">';
+    $pseudo_r .= '$2 </div> </div>';
 
-    // Latex style newline // into <br>
-    $pattern_n = '/\/\//';
-    $replacement_n = '<br>';
+    // Latex style newline // into <br>, if not a weblink
+    $nline_p = '/(?<!(http)|(https):)\/\//';
+    $nline_r = '<br>';
 
-    // Replace all
+    // Tabs from \t
+    $tab_p = '/\\\t/';
+    $tab_r = '&nbsp;&nbsp;&nbsp;&nbsp;';
+
+    // Replace all the above
     $result = preg_replace(
-      array($pattern_p,$pattern_n),
-      array($replacement_p,$replacement_n),
+      array($pseudo_p, $nline_p, $tab_p),
+      array($pseudo_r, $nline_r, $tab_r),
       $text
     );
     return $result;
