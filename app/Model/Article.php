@@ -105,6 +105,31 @@ EOS;
   }
 
   /**
+   * Replace custom markdown or HTML will full definition
+   */
+  public function customMD($text) {
+    // Pseudo code: match everything until first ">"
+    // First capturing group is header, second is body
+    $pattern_p = "/<pseudo.*header=([^>]*)>\s(.*)<\/pseudo>/s";
+    $replacement_p = '<div class="panel panel-default">';
+    $replacement_p .= '<div class="panel-heading">$1</div>';
+    $replacement_p .= '<div class="panel-body">';
+    $replacement_p .= '$2 </div> </div>';
+
+    // Latex style newline // into <br>
+    $pattern_n = '/\/\//';
+    $replacement_n = '<br>';
+
+    // Replace all
+    $result = preg_replace(
+      array($pattern_p,$pattern_n),
+      array($replacement_p,$replacement_n),
+      $text
+    );
+    return $result;
+  }
+
+  /**
    * Get single article by id
    */
   public function getArticleByUrl($url) {

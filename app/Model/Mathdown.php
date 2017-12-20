@@ -29,9 +29,9 @@ class Mathdown {
    * Here we remove the ticks after the parsedown pass
    */
   public function parsemath_post($text) {
-    $pattern1 = "/<\/p>[\n\r]+<div><spaninline/";
+    $pattern1 = "/(<\/p>)?[\n\r]+<div>[\n\r]?<spaninline/";
     $replacement1 = '<span';
-    $pattern2 = "/spaninline><\/div>[\n\r]+<p>/";
+    $pattern2 = "/spaninline>[\n\r]?<\/div>[\n\r]+(<p>)?/";
     $replacement2 = 'span> ';
     $result = preg_replace(
         array($pattern1, $pattern2),

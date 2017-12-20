@@ -193,6 +193,7 @@ $app->get('/article/{url}', function ($request, $response, $args) {
   $article = $this->article->getArticleByUrl($args['url'])[0];
   $parse_math = $article->parse_math == '1' ? 1 : 0;
   $rend_body = $article->body;
+  $rend_body = $this->article->customMD($rend_body);
   $comments = $this->article->getComments($article);
   $analytics = $this->analytics->getScript();
   if($parse_math) {
@@ -220,6 +221,7 @@ $app->post('/article/parse_md', function ($request, $response, $args) {
   $parse_math = (isset($_POST['parse_math'])) ? 1 : 0;
   // Get the markdown from the post request's body argument
   $rend_body = $_POST['body'];
+  $rend_body = $this->article->customMD($rend_body);
   // Render math in the markdown
   if($parse_math) {
     $rend_body = $this->mathdown->parsemath_pre($rend_body);
