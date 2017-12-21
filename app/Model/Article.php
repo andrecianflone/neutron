@@ -120,8 +120,8 @@ EOS;
     $nline_p = '/(?<!(http)|(https):)\/\//';
     $nline_r = '<br>';
 
-    // Tabs from \t
-    $tab_p = '/\\\t/';
+    // Tabs from \t if not \text (negative lookahead)
+    $tab_p = '/\\\t(?!ext)/';
     $tab_r = '&nbsp;&nbsp;&nbsp;&nbsp;';
 
     // Replace all the above
