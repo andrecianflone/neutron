@@ -110,11 +110,12 @@ EOS;
   public function customMD($text) {
     // Pseudo code: match everything until first ">"
     // First capturing group is header, second is body
-    $pseudo_p = "/<pseudo.*header=([^>]*)>\s(.*)<\/pseudo>/s";
+    $pseudo_p = "/<pseudo.*header=([^>]*)>\s(.*?)(?:footer=)?((?<=footer=).*)?<\/pseudo>/s";
     $pseudo_r = '<div class="panel panel-default">';
     $pseudo_r .= '<div class="panel-heading">$1</div>';
-    $pseudo_r .= '<div class="panel-body">';
-    $pseudo_r .= '$2 </div> </div>';
+    $pseudo_r .= '<div class="panel-body">$2</div>';
+    $pseudo_r .= '<div class="panel-footer">$3</div>';
+    $pseudo_r .= '</div>';
 
     // Latex style newline // into <br>, if not a weblink
     $nline_p = '/(?<!(http)|(https):)\/\//';
@@ -130,6 +131,12 @@ EOS;
       array($pseudo_r, $nline_r, $tab_r),
       $text
     );
+
+    // remove empty div
+    $empty_p = '/<div class="panel-footer"><\/div>/s';
+    $empty_r = '';
+    $result = preg_replace($empty_p, $empty_r, $result);
+
     return $result;
   }
 

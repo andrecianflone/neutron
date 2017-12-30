@@ -19,6 +19,9 @@ a:hover {
   text-decoration: none;
 }
 
+.panel-footer {
+  background-color:#ffffff
+}
 .center {
   text-align: center;
 }
