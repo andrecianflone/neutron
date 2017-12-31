@@ -109,8 +109,10 @@ EOS;
    */
   public function customMD($text) {
     // Pseudo code: match everything until first ">"
-    // First capturing group is header, second is body
-    $pseudo_p = "/<pseudo.*header=([^>]*)>\s(.*?)(?:footer=)?((?<=footer=).*)?<\/pseudo>/s";
+    // First capturing group is header, second is body, third is footer
+    // Lazy capture (non-greedy) for all, in case there are multiple pseudo,
+    // which is accomplished with '?' after '.*'
+    $pseudo_p = "/<pseudo.*?header=([^>]*)>\s(.*?)(?:footer=)?((?<=footer=).*?)?<\/pseudo>/s";
     $pseudo_r = '<div class="panel panel-default">';
     $pseudo_r .= '<div class="panel-heading">$1</div>';
     $pseudo_r .= '<div class="panel-body">$2</div>';
@@ -125,12 +127,25 @@ EOS;
     $tab_p = '/\\\t(?!ext)/';
     $tab_r = '&nbsp;&nbsp;&nbsp;&nbsp;';
 
-    // Replace all the above
-    $result = preg_replace(
-      array($pseudo_p, $nline_p, $tab_p),
-      array($pseudo_r, $nline_r, $tab_r),
-      $text
-    );
+    // Replace all the above for all matches
+    $count = 1;
+    $limit = -1;
+    $safe = 0;
+    $result = '';
+    $safe_limit = 5;
+    while (($count > 0) && ($safe < $safe_limit)){
+      $result = preg_replace(
+        array($pseudo_p, $nline_p, $tab_p),
+        array($pseudo_r, $nline_r, $tab_r),
+        $text, $limit, $count
+      );
+      $safe++;
+    }
+    //if ($safe >= $safe_limit){
+      //$msg = 'infinit loop in Article/customMD, regex count is '.$count;
+      //$msg .= ' and loops are '.$safe;
+      //$result = $msg.'<pre> \n'.$result.'</pre>';
+    //}
 
     // remove empty div
     $empty_p = '/<div class="panel-footer"><\/div>/s';
